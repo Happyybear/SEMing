@@ -44,7 +44,7 @@ static NSMutableArray * dataArrary;
 - (void)createButton{
     dataArrary = [[NSMutableArray alloc] initWithObjects:_tempData, nil];
     NSLog(@"%d",dataArrary.count);
-    for (Node * node in _tempData) {
+    for (Node * node in _dataSource) {
         UIButton * btn = [UIButton buttonWithType:UIButtonTypeCustom];
         btn.selected = NO;
         if (btn.selected) {
@@ -72,7 +72,7 @@ static NSMutableArray * dataArrary;
         
         
         int level = 0;
-        for (Node * node in _tempData) {
+        for (Node * node in _dataSource) {
             if (node.nodeId == _btn.intFlag - 201212) {
                 level = node.depth;
             }
@@ -86,7 +86,7 @@ static NSMutableArray * dataArrary;
         model.node = node1;
         model.selected = YES;
         int level = 0;
-        for (Node * node in _tempData) {
+        for (Node * node in _dataSource) {
             if (node.nodeId == _btn.intFlag - 201212) {
                 level = node.depth;
             }
@@ -138,7 +138,7 @@ static NSMutableArray * dataArrary;
     switch (level) {
         case 0:
             //0
-            for (Node * node in _tempData) {
+            for (Node * node in _dataSource) {
                 for (UIButton * button in _btnArr) {
                     if ((button.intFlag -201212) == node.nodeId && node.parentId == (btn.intFlag -201212)) {
                         if (node.depth == 1) {
@@ -151,7 +151,7 @@ static NSMutableArray * dataArrary;
             break;
         case 1:
             //1
-            for (Node * node in _tempData) {
+            for (Node * node in _dataSource) {
                 for (UIButton * button in _btnArr) {
                     if ((button.intFlag -201212) == node.nodeId) {
                         if (node.depth == 2 && node.parentId == (btn.intFlag -201212)) {
@@ -164,7 +164,7 @@ static NSMutableArray * dataArrary;
             break;
         case 2:
             //2
-            for (Node * node in _tempData) {
+            for (Node * node in _dataSource) {
                 for (UIButton * button in _btnArr) {
                     if ((button.intFlag -201212) == node.nodeId) {
                         if (node.depth == 3 && node.parentId == (btn.intFlag -201212)) {
@@ -176,7 +176,7 @@ static NSMutableArray * dataArrary;
             }
             break;
         case 3:
-            for (Node * node in _tempData) {
+            for (Node * node in _dataSource) {
                 for (UIButton * button in _btnArr) {
                     if (node.depth == 3 && (button.intFlag - 201212) == node.nodeId) {
                         if ((btn.intFlag - 201212) == node.nodeId && btn.intFlag == button.intFlag)
