@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11201" systemVersion="16A323" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11161"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="HYRemoteViewController">
+            <connections>
+                <outlet property="middleBtn" destination="pzY-VY-uI4" id="3Lm-OD-uj1"/>
+                <outlet property="middleImage" destination="7fu-vQ-A3F" id="qXK-yn-7ry"/>
+                <outlet property="offBtn" destination="dWF-5f-wZG" id="Z63-IQ-MHL"/>
+                <outlet property="onBtn" destination="jkz-jN-Qr2" id="BG6-uA-pgh"/>
+                <outlet property="relieveBtn" destination="2ut-pD-8s0" id="c9p-7o-4DV"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+                <outlet property="warningBtn" destination="Hca-K5-j39" id="7OQ-3N-cBr"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="alS-Mm-ccX">
+                    <subviews>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="bigbutton" translatesAutoresizingMaskIntoConstraints="NO" id="0ca-RU-4f1"/>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Hca-K5-j39" customClass="WGMSectorButton">
+                            <constraints>
+                                <constraint firstAttribute="height" constant="150" id="0j6-Pk-axE"/>
+                                <constraint firstAttribute="width" constant="70" id="fMX-lY-3l9"/>
+                            </constraints>
+                            <state key="normal" backgroundImage="ling"/>
+                            <connections>
+                                <action selector="warningClick:" destination="-1" eventType="touchUpInside" id="Fgx-gP-xwj"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2ut-pD-8s0" customClass="WGMSectorButton">
+                            <constraints>
+                                <constraint firstAttribute="width" constant="70" id="bHc-Ka-k8m"/>
+                                <constraint firstAttribute="height" constant="150" id="yzU-bp-Euk"/>
+                            </constraints>
+                            <state key="normal" backgroundImage="chu"/>
+                            <connections>
+                                <action selector="relieveClick:" destination="-1" eventType="touchUpInside" id="X4U-7O-mJI"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pzY-VY-uI4" customClass="WGMSectorButton">
+                            <constraints>
+                                <constraint firstAttribute="width" constant="100" id="ew2-n5-Kyb"/>
+                                <constraint firstAttribute="height" constant="100" id="vVr-Pl-VQa"/>
+                            </constraints>
+                            <state key="normal" backgroundImage="lock"/>
+                            <connections>
+                                <action selector="middleBtnClick:" destination="-1" eventType="touchUpInside" id="HQ1-OB-NVc"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jkz-jN-Qr2" customClass="WGMSectorButton">
+                            <constraints>
+                                <constraint firstAttribute="height" constant="70" id="EwD-SU-0fN"/>
+                                <constraint firstAttribute="width" constant="150" id="lkO-Lx-c3c"/>
+                            </constraints>
+                            <state key="normal" backgroundImage="on"/>
+                            <connections>
+                                <action selector="onPowerClick:" destination="-1" eventType="touchUpInside" id="IHO-fd-rIh"/>
+                            </connections>
+                        </button>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="7fu-vQ-A3F">
+                            <constraints>
+                                <constraint firstAttribute="height" constant="40" id="OJ2-fk-My9"/>
+                                <constraint firstAttribute="width" constant="40" id="gZr-7a-gkF"/>
+                            </constraints>
+                        </imageView>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dWF-5f-wZG" customClass="WGMSectorButton">
+                            <constraints>
+                                <constraint firstAttribute="height" constant="70" id="BGw-h8-xqJ"/>
+                                <constraint firstAttribute="width" constant="150" id="ns3-Rc-Qqy"/>
+                            </constraints>
+                            <state key="normal" backgroundImage="off"/>
+                            <connections>
+                                <action selector="offPowerClick:" destination="-1" eventType="touchUpInside" id="mho-NU-s6m"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <constraints>
+                        <constraint firstItem="0ca-RU-4f1" firstAttribute="top" secondItem="alS-Mm-ccX" secondAttribute="top" id="6jI-QY-dfN"/>
+                        <constraint firstItem="7fu-vQ-A3F" firstAttribute="centerY" secondItem="0ca-RU-4f1" secondAttribute="centerY" id="BWx-P1-fDc"/>
+                        <constraint firstItem="7fu-vQ-A3F" firstAttribute="top" secondItem="dWF-5f-wZG" secondAttribute="bottom" constant="30" id="MJs-aS-kND"/>
+                        <constraint firstItem="7fu-vQ-A3F" firstAttribute="centerX" secondItem="0ca-RU-4f1" secondAttribute="centerX" id="MYU-nm-Jh4"/>
+                        <constraint firstItem="7fu-vQ-A3F" firstAttribute="leading" secondItem="Hca-K5-j39" secondAttribute="trailing" constant="27" id="OIL-3b-t6k"/>
+                        <constraint firstItem="jkz-jN-Qr2" firstAttribute="top" secondItem="7fu-vQ-A3F" secondAttribute="bottom" constant="30" id="PeG-Wz-OaP"/>
+                        <constraint firstAttribute="height" constant="280" id="QEz-j9-Qo4"/>
+                        <constraint firstItem="0ca-RU-4f1" firstAttribute="leading" secondItem="alS-Mm-ccX" secondAttribute="leading" id="VrB-qo-WBY"/>
+                        <constraint firstAttribute="trailing" secondItem="0ca-RU-4f1" secondAttribute="trailing" id="bQr-Es-GXS"/>
+                        <constraint firstItem="7fu-vQ-A3F" firstAttribute="centerY" secondItem="pzY-VY-uI4" secondAttribute="centerY" id="bVN-Cp-qje"/>
+                        <constraint firstItem="7fu-vQ-A3F" firstAttribute="centerX" secondItem="pzY-VY-uI4" secondAttribute="centerX" id="cr3-T1-lCs"/>
+                        <constraint firstItem="7fu-vQ-A3F" firstAttribute="centerY" secondItem="Hca-K5-j39" secondAttribute="centerY" id="dlM-Mw-ThW"/>
+                        <constraint firstAttribute="width" constant="280" id="ewb-CY-8xd"/>
+                        <constraint firstAttribute="bottom" secondItem="0ca-RU-4f1" secondAttribute="bottom" id="kIp-gx-jYk"/>
+                        <constraint firstItem="7fu-vQ-A3F" firstAttribute="centerX" secondItem="dWF-5f-wZG" secondAttribute="centerX" id="pY4-hA-ohu"/>
+                        <constraint firstItem="7fu-vQ-A3F" firstAttribute="centerY" secondItem="2ut-pD-8s0" secondAttribute="centerY" id="rLO-S6-IrB"/>
+                        <constraint firstItem="2ut-pD-8s0" firstAttribute="leading" secondItem="7fu-vQ-A3F" secondAttribute="trailing" constant="29" id="rhw-NT-qVd"/>
+                        <constraint firstItem="7fu-vQ-A3F" firstAttribute="centerX" secondItem="jkz-jN-Qr2" secondAttribute="centerX" id="tjy-He-MYb"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <color key="backgroundColor" red="1" green="0.99997437000274658" blue="0.99999129772186279" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="alS-Mm-ccX" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" id="5pV-T8-wvX"/>
+                <constraint firstItem="alS-Mm-ccX" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="QDO-4V-4PF"/>
+                <constraint firstItem="alS-Mm-ccX" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" id="oLd-5y-9CK"/>
+                <constraint firstItem="alS-Mm-ccX" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="t1d-l5-Lqz"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="193" y="34"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="bigbutton" width="450" height="450"/>
+        <image name="chu" width="107" height="217"/>
+        <image name="ling" width="107" height="217"/>
+        <image name="lock" width="123" height="123"/>
+        <image name="off" width="216" height="107"/>
+        <image name="on" width="217" height="107"/>
+    </resources>
+</document>

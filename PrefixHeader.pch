@@ -1,0 +1,39 @@
+//
+//  PrefixHeader.pch
+//  HYSEM
+//
+//  Created by xlc on 16/11/15.
+//  Copyright © 2016年 WGM. All rights reserved.
+//
+
+#ifndef PrefixHeader_pch
+#define PrefixHeader_pch
+
+#import "HYHeader.h"
+
+#import <UIKit/UIKit.h>
+
+#define SCREEN_H  ([UIScreen mainScreen].bounds.size.height - 64)
+#define SCREEN_W  [UIScreen mainScreen].bounds.size.width
+
+//一天的长度
+#define ONEDay (24*60*60)
+
+#define RGBA(r,g,b,a) [UIColor colorWithRed:(r)/255.0 green:(g)/255.0 blue:(b)/255.0 alpha:(a)]
+
+#define RGB(r, g, b)                        RGBA(r, g, b, 1.0f)
+
+#define SocketHOST @"123.233.120.197"         //服务器ip地址
+#define SocketonPort 4404                     //服务器端口号
+
+#define HY_NSusefDefaults [NSUserDefaults standardUserDefaults]
+
+
+#define DEBUG_MODE 1
+#if DEBUG_MODE
+#define DLog( s, ... ) NSLog( @"<%p %@:(%d)> %@", self, [[NSString stringWithUTF8String:__FILE__] lastPathComponent], __LINE__, [NSString stringWithFormat:(s), ##__VA_ARGS__] )
+#else
+#define DLog( s, ... )
+#endif
+
+#endif /* PrefixHeader_pch */

@@ -1,0 +1,25 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "8408a2ad-5735-6747-b522-e67f99dba109++369",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+    "8408a2ad-5735-6747-b522-e67f99dba109++369" : {
+
+    }
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "8408a2ad-5735-6747-b522-e67f99dba109++369" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "EAF8F0FB-6D95-4F32-8EBF-CB5A9032B809",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "8408a2ad-5735-6747-b522-e67f99dba109++369" : "iOS2.0\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "HYSEM",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "trunk\/HYSEM.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/192.168.1.84\/svn\/SEM",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Subversion",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "8408a2ad-5735-6747-b522-e67f99dba109++369"
+    }
+  ]
+}
