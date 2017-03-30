@@ -102,5 +102,6 @@
 //解析分段数据
 - (int)TSR376_Analysis_TableCodeForHourInfFame:(unsigned char *)in_bufer bufer_len:(int)bufer_len iEnd:(int*)iEnd;
 
++(UIButton *)createButtonWithFrame:(CGRect)frame title:(NSString *)title titleColor:(UIColor *)titleColor imageName:(NSString *)imageName backgroundImageName:(NSString *)backgroundImageName target:(id)target selector:(SEL)selector;
 
 @end

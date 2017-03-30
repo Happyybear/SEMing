@@ -109,6 +109,7 @@
 
 - (void)createUI
 {
+    [HY_NSusefDefaults removeObjectForKey:@"BTN"];
     HYSingleManager *manager = [HYSingleManager sharedManager];
     NSMutableArray *nodeArr = [[NSMutableArray alloc]init];
     for (int i = 0; i<manager.archiveUser.child_obj.count; i++) {

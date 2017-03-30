@@ -91,6 +91,7 @@
 //存储
 @property (nonatomic,strong) NSMutableArray * memory_Array;
 
+@property (nonatomic,strong) NSMutableArray * rea_memory_Array;
 +(id)sharedManager;
 
 @end

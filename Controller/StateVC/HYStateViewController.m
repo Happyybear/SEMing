@@ -15,6 +15,7 @@
 #import "DeviceModel.h"
 #import "DataModel.h"
 #import "DateModel.h"
+#import "HYExplainManager.h"
 @interface HYStateViewController ()<TWlALertviewDelegate,UITableViewDelegate,UITableViewDataSource,ChartViewDelegate,IChartAxisValueFormatter>
 {
     GCDAsyncSocket *_sendSocket;
@@ -39,7 +40,9 @@
     NSString *_MpID;//同上
     UILabel *_MpLabel;//webVied上边表示表名字的label
     NSString *ipv6Addr;
-    
+    NSString * nameA;
+    NSString * nameB;
+    NSString * nameC;
     int _indexSegment;//区分是列表还是图像,0:列表  1:图像
 }
 
@@ -498,6 +501,9 @@
 {
     //先将原来的折线图从父视图移除(别忘了webview上边表示表名字的lable)
     [_MpLabel removeFromSuperview];
+    for (UIView * view in self.second.view.subviews) {
+        [view removeFromSuperview];
+    }
     [self.LineChartView removeFromSuperview];
     //重新创建折线图`
     [self createChartView];
@@ -576,13 +582,14 @@
 
 -(void) recieveData{
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(createDataSource) name:@"getStatusData" object:nil];
-    
 }
 
 
 -(void) createDataSource{
     [self createTableHead];
     HYSingleManager * manager = [HYSingleManager sharedManager];
+    manager.rea_memory_Array = [[NSMutableArray alloc] init];
+    manager.rea_memory_Array = manager.memory_Array;
     _dataSource = manager.memory_Array;
     
     [SVProgressHUD showSuccessWithStatus:@"通讯成功"];
@@ -1895,7 +1902,7 @@
     _dataSourceB = [[NSMutableArray alloc] init];
     _dataSourceC = [[NSMutableArray alloc] init];
     HYSingleManager * manager = [HYSingleManager sharedManager];
-    for (DeviceModel * de in manager.memory_Array) {
+    for (DeviceModel * de in manager.rea_memory_Array) {
         for (DateModel * date in de.dataArr) {
             for (DataModel * data in date.data) {
                 switch (request_type) {
@@ -1946,46 +1953,8 @@
 
 - (void)createChartView
 {
-    
     [self getChartViewData];
-    NSMutableArray *nameArr = [NSMutableArray array];
-    NSMutableArray *mp_IDArr = [NSMutableArray array];
-    HYSingleManager *manager = [HYSingleManager sharedManager];
-    for (int i = 0; i<manager.archiveUser.child_obj.count; i++) {
-        CCompanyModel *company = manager.archiveUser.child_obj[i];
-        for (int j = 0; j<company.child_obj1.count; j++) {
-            CTerminalModel *terminal = company.child_obj1[j];
-            for (int k = 0; k<terminal.child_obj.count; k++) {
-                CMPModel *mp = terminal.child_obj[k];
-                [nameArr addObject:mp.name];
-                [mp_IDArr addObject:[NSString stringWithFormat:@"%llu",mp.strID]];
-            }
-        }
-    }
-    NSMutableArray *aray = [NSMutableArray array];
-    for (int i = 0; i<mp_IDArr.count; i++) {
-        if ([mp_IDArr[i] isEqualToString:_MpID]) {
-            [aray addObject:[NSString stringWithFormat:@"%d",i]];
-        }
-    }
-    int tableNum = 0;//每块表的数据个数
-    tableNum = (int)(_dataSourceA.count/nameArr.count);
-    if (aray.count == 0) {
-        return;
-    }
-    int mpStart = [aray[0] intValue];
-    self.time = [NSMutableArray array];
-    self.dataA = [NSMutableArray array];
-    self.dataB = [NSMutableArray array];
-    self.dataC = [NSMutableArray array];
-    for (int i = mpStart*tableNum; i<mpStart*tableNum+tableNum; i++) {
-        [self.time addObject:_timeArray[i]];
-        [self.dataA addObject:_dataSourceA[i]];
-        [self.dataB addObject:_dataSourceB[i]];
-        [self.dataC addObject:_dataSourceC[i]];
-    }
-    
-    
+    [self dealChartDataWithFlag:0];
     _MpLabel = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_W/2-75, 10, 150, 30)];
     [_MpLabel setFont:[UIFont systemFontOfSize:12]];
     _MpLabel.textAlignment = NSTextAlignmentCenter;
@@ -2000,11 +1969,15 @@
     [self.second.view addSubview:btn];
     [btn addTarget:self action:@selector(pushSecondController) forControlEvents:UIControlEventTouchUpInside];
     
+    //
+    if (self.LineChartView) {
+        [self.LineChartView removeFromSuperview];
+    }
     self.LineChartView = [[LineChartView alloc]initWithFrame:CGRectMake(0, 40, SCREEN_W, SCREEN_H-100)];
     self.LineChartView.delegate = self;
     [self.second.view addSubview:self.LineChartView];
     
-//    self.LineChartView.backgroundColor = RGB(230, 253, 253);
+    //    self.LineChartView.backgroundColor = RGB(230, 253, 253);
     //设置交互样式
     self.LineChartView.scaleYEnabled = NO;//取消Y轴缩放
     self.LineChartView.doubleTapToZoomEnabled = NO;//取消双击缩放
@@ -2054,11 +2027,182 @@
     self.LineChartView.legend.position = ChartLegendPositionAboveChartCenter;//图例位置
     self.LineChartView.legend.formSize = 30;//图例中线条的长度
     self.LineChartView.legend.textColor = [UIColor darkGrayColor];//图例文字颜色
-    self.LineChartView.data = [self setData];
+    self.LineChartView.data = [self setDataWithTag1:0 andTag2:0 andTag3:0];
+    
+    [self addButton];
+}
+
+- (void)addButton
+{
+    //添加按钮
+    UIButton * btn1 = [HYExplainManager createButtonWithFrame:CGRectMake(SCREEN_W/2-60-35-35,0, 35 +50, 15) title:nil titleColor:[UIColor greenColor] imageName:nil backgroundImageName:nil target:self selector:@selector(action:)];
+    [btn1 addTarget:self action:@selector(action:) forControlEvents:UIControlEventTouchUpInside];
+    btn1.tag = 666;
+    UIButton * btn2 = [HYExplainManager createButtonWithFrame:CGRectMake(SCREEN_W/2-35,0, 35 + 50, 15) title:nil titleColor:[UIColor greenColor] imageName:nil backgroundImageName:nil target:self selector:@selector(action:)];
+    btn2.tag = 667;
+    UIButton * btn3 = [HYExplainManager createButtonWithFrame:CGRectMake(SCREEN_W/2+60,0, 35 + 50, 15) title:nil titleColor:[UIColor greenColor] imageName:nil backgroundImageName:nil target:self selector:@selector(action:)];
+    btn3.tag = 668;
+    self.second.view.userInteractionEnabled = YES;
+    UILabel * label1 = [[UILabel alloc] initWithFrame:CGRectMake(SCREEN_W/2-60-35-35, 7, 30, 3)];
+    label1.backgroundColor = RGB(255, 238, 0);
+    
+    UILabel * labelName1 = [[UILabel alloc] initWithFrame:CGRectMake(SCREEN_W/2-60-35-35+30+5, 0, 47, 14)];
+    labelName1.text =_label1;
+    labelName1.textColor = [UIColor grayColor];
+    labelName1.adjustsFontSizeToFitWidth = YES;
+    
+    UILabel * label2 = [[UILabel alloc] initWithFrame:CGRectMake(SCREEN_W/2-35, 7, 30, 3)];
+    label2.backgroundColor = RGB(61, 145, 64);
+    
+    UILabel * labelName2 = [[UILabel alloc] initWithFrame:CGRectMake(SCREEN_W/2-35+30+5, 0, 47, 14)];
+    labelName2.text =  _label2;
+    labelName2.textColor = [UIColor grayColor];
+    labelName2.adjustsFontSizeToFitWidth = YES;
+    
+    UILabel * label3 = [[UILabel alloc] initWithFrame:CGRectMake(SCREEN_W/2+60, 7, 30, 3)];
+    label3.backgroundColor = RGB(255, 0, 0);
+    
+    UILabel * labelName3 = [[UILabel alloc] initWithFrame:CGRectMake(SCREEN_W/2+60+30+5, 0, 47, 14)];
+    labelName3.text = _label3;
+    labelName3.textColor = [UIColor grayColor];
+    labelName3.adjustsFontSizeToFitWidth = YES;
+    
+    UIView * backView = [[UIView alloc] initWithFrame:CGRectMake(0, 42, SCREEN_W, 30)];
+    backView.backgroundColor = [UIColor whiteColor];
+    [self.second.view addSubview:backView];
+    [backView addSubview:label1];
+    [backView addSubview:labelName1];
+    [backView addSubview:label2];
+    [backView addSubview:labelName2];
+    [backView addSubview:label3];
+    [backView addSubview:labelName3];
+    [backView addSubview:btn1];
+    [backView addSubview:btn2];
+    [backView addSubview:btn3];
+}
+
+- (void)dealChartDataWithFlag:(NSInteger)flag
+{
+    NSMutableArray *nameArr = [NSMutableArray array];
+    NSMutableArray *mp_IDArr = [NSMutableArray array];
+    HYSingleManager *manager = [HYSingleManager sharedManager];
+    for (int i = 0; i<manager.archiveUser.child_obj.count; i++) {
+        CCompanyModel *company = manager.archiveUser.child_obj[i];
+        for (int j = 0; j<company.child_obj1.count; j++) {
+            CTerminalModel *terminal = company.child_obj1[j];
+            for (int k = 0; k<terminal.child_obj.count; k++) {
+                CMPModel *mp = terminal.child_obj[k];
+                [nameArr addObject:mp.name];
+                [mp_IDArr addObject:[NSString stringWithFormat:@"%llu",mp.strID]];
+            }
+        }
+    }
+    NSMutableArray *aray = [NSMutableArray array];
+    for (int i = 0; i<mp_IDArr.count; i++) {
+        if ([mp_IDArr[i] isEqualToString:_MpID]) {
+            [aray addObject:[NSString stringWithFormat:@"%d",i]];
+        }
+    }
+    int tableNum = 0;//每块表的数据个数
+    tableNum = (int)(_dataSourceA.count/nameArr.count);
+    if (aray.count == 0) {
+        return;
+    }
+    int mpStart = [aray[0] intValue];
+    self.time = [NSMutableArray array];
+    self.dataA = [NSMutableArray array];
+    self.dataB = [NSMutableArray array];
+    self.dataC = [NSMutableArray array];
+    if (flag == 0) {
+        for (int i = mpStart*tableNum; i<mpStart*tableNum+tableNum; i++) {
+            [self.time addObject:_timeArray[i]];
+            [self.dataA addObject:_dataSourceA[i]];
+            [self.dataB addObject:_dataSourceB[i]];
+            [self.dataC addObject:_dataSourceC[i]];
+        }
+    }else if (flag == 1){
+        for (int i = mpStart*tableNum; i<mpStart*tableNum+tableNum; i++) {
+            [self.time addObject:_timeArray[i]];
+            [self.dataA addObject:_dataSourceA[i]];
+        }
+    }else if (flag == 2){
+        for (int i = mpStart*tableNum; i<mpStart*tableNum+tableNum; i++) {
+            [self.time addObject:_timeArray[i]];
+            [self.dataB addObject:_dataSourceB[i]];
+        }
+    }else if (flag == 3){
+        for (int i = mpStart*tableNum; i<mpStart*tableNum+tableNum; i++) {
+            [self.time addObject:_timeArray[i]];
+            [self.dataC addObject:_dataSourceC[i]];
+        }
+    }
 
 }
 
-- (LineChartData *)setData
+- (void)updataChartWithTag1:(NSInteger)tag1 andTag2:(NSInteger)tag2 andTag3:(NSInteger)tag3
+{
+   self.LineChartView.data = [self setDataWithTag1:tag1 andTag2:tag2 andTag3:tag3];
+}
+
+- (void)action:(UIButton *)button
+{
+    
+    switch (button.tag) {
+        case 666:
+            //按钮1
+        {
+            if ([button isSelected]) {
+                button.selected = NO;
+            }else{
+                button.selected = YES;
+            }
+            break;
+        }
+        case 667:
+            //2
+        {
+            if ([button isSelected]) {
+                button.selected = NO;
+            }else{
+                button.selected = YES;
+            }
+            break;
+        }
+        case 668:
+            //3
+        {
+            if ([button isSelected]) {
+                button.selected = NO;
+            }else{
+                button.selected = YES;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+    UIButton * btn1 = [self.second.view viewWithTag:666];
+    UIButton * btn2 = [self.second.view viewWithTag:667];
+    UIButton * btn3 = [self.second.view viewWithTag:668];
+    NSInteger tag1,tag2,tag3;
+    if ([btn1 isSelected]) {
+        tag1 = 1;
+    }else{
+        tag1 = 0;
+    }
+    if ([btn2 isSelected]) {
+        tag2 = 1;
+    }else{
+        tag2 = 0;
+    }
+    if ([btn3 isSelected]) {
+        tag3 = 1;
+    }else{
+        tag3 = 0;
+    }
+    [self updataChartWithTag1:tag1 andTag2:tag2 andTag3:tag3];
+}
+- (LineChartData *)setDataWithTag1:(NSInteger) tag1 andTag2:(NSInteger)tag2 andTag3:(NSInteger)tag3
 {
     //Y轴数据
     NSMutableArray *yVals1 = [NSMutableArray array];
@@ -2111,23 +2255,30 @@
     LineChartDataSet *set1 = nil;
     LineChartDataSet *set2 = nil;
     LineChartDataSet *set3 = nil;
-    if (self.LineChartView.data.dataSetCount > 0) {
-        LineChartData *data = (LineChartData *)self.LineChartView.data;
-        set1 = (LineChartDataSet *)data.dataSets[0];
-        set1.values = yVals1;
-        set2 = (LineChartDataSet *)data.dataSets[0];
-        set2.values = yVals2;
-        set3 = (LineChartDataSet *)data.dataSets[0];
-        set3.values = yVals3;
-        return data;
-    }else{
+//    if (self.LineChartView.data.dataSetCount > 0) {
+//        LineChartData *data = (LineChartData *)self.LineChartView.data;
+//        set1 = (LineChartDataSet *)data.dataSets[0];
+//        set1.values = yVals1;
+//        set2 = (LineChartDataSet *)data.dataSets[0];
+//        set2.values = yVals2;
+//        set3 = (LineChartDataSet *)data.dataSets[0];
+//        set3.values = yVals3;
+//        return data;
+//    }else{
         //创建LineChartDataSet对象
         set1 = [[LineChartDataSet alloc] initWithValues:yVals1 label:_label1];
         //设置折线的样式
         set1.lineWidth = 1.0/[UIScreen mainScreen].scale;//折线宽度
         set1.drawValuesEnabled = YES;//是否在拐点处显示数据
-        set1.valueColors = @[[UIColor yellowColor]];//折线拐点处显示数据的颜色
-        [set1 setColor:RGB(255, 238, 0)];//折线颜色
+
+        if (tag1 == 1) {
+            set1.valueColors = @[[UIColor clearColor]];//折线拐点处显示数据的颜色
+            [set1 setColor:RGBA(0, 0, 0, 0)];//折线颜色
+        }else{
+            set1.valueColors = @[[UIColor yellowColor]];//折线拐点处显示数据的颜色
+            [set1 setColor:RGB(255, 238, 0)];//折线颜色
+        }
+    
         set1.drawSteppedEnabled = NO;//是否开启绘制阶梯样式的折线图
         //折线拐点样式
         set1.drawCirclesEnabled = NO;//是否绘制拐点
@@ -2163,36 +2314,60 @@
         //添加第二个LineChartDataSet对象
         set2 = [[LineChartDataSet alloc]initWithValues:yVals2 label:_label2];
         [set2 setColor:[UIColor redColor]];
-        set2.drawFilledEnabled = NO;//是否填充颜色
         set2.highlightEnabled = NO;
-        set2.valueColors = @[[UIColor greenColor]];//折线拐点处显示数据的颜色
-        set2.drawCircleHoleEnabled = NO;//是否绘制中间的空心
-        set2.drawCirclesEnabled = NO;//是否绘制拐点
-        [set2 setColor:RGB(61, 145, 64)];//折线颜色
-        set2.fillColor = [UIColor redColor];//填充颜色
-        set2.fillAlpha = 0.1;//填充颜色的透明度
+        set2.drawFilledEnabled = NO;//是否填充颜色
+        if (tag2 == 1) {
+            set2.valueColors = @[[UIColor clearColor]];//折线拐点处显示数据的颜色
+            set2.drawCircleHoleEnabled = NO;//是否绘制中间的空心
+            set2.drawCirclesEnabled = NO;//是否绘制拐点
+            [set2 setColor:RGBA(0, 0, 0, 0)];//折线颜色
+            set2.fillColor = [UIColor clearColor];//填充颜色
+            set2.fillAlpha = 0.1;//填充颜色的透明度
+            [set2 setColor:[UIColor clearColor]];
+        }else{
+            set2.valueColors = @[[UIColor greenColor]];//折线拐点处显示数据的颜色
+            set2.drawCircleHoleEnabled = NO;//是否绘制中间的空心
+            set2.drawCirclesEnabled = NO;//是否绘制拐点
+            [set2 setColor:RGB(61, 145, 64)];//折线颜色
+            set2.fillColor = [UIColor redColor];//填充颜色
+            set2.fillAlpha = 0.1;//填充颜色的透明度
+
+        }
         [dataSets addObject:set2];
         
         set3 = [[LineChartDataSet alloc]initWithValues:yVals3 label:_label3];
-        [set3 setColor:[UIColor redColor]];
-        set3.drawFilledEnabled = NO;//是否填充颜色
-        set3.drawCirclesEnabled = NO;//是否绘制拐点
-        set3.valueColors = @[[UIColor redColor]];//折线拐点处显示数据的颜色
-        set3.drawCircleHoleEnabled = NO;//是否绘制中间的空心
-        set3.highlightEnabled = NO;
-        set3.fillColor = [UIColor redColor];//填充颜色
-        set3.fillAlpha = 0.1;//填充颜色的透明度
-        [set3 setColor:RGB(255, 0, 0)];//折线颜色
+        if (tag3 == 1) {
+            [set3 setColor:[UIColor clearColor]];
+            set3.drawFilledEnabled = NO;//是否填充颜色
+            set3.drawCirclesEnabled = NO;//是否绘制拐点
+            set3.valueColors = @[[UIColor clearColor]];//折线拐点处显示数据的颜色
+            set3.drawCircleHoleEnabled = NO;//是否绘制中间的空心
+            set3.highlightEnabled = NO;
+            set3.fillColor = [UIColor clearColor];//填充颜色
+            set3.fillAlpha = 0.1;//填充颜色的透明度
+            [set3 setColor:RGBA(0, 0, 0, 0)];//折线颜色
+
+        }else{
+            [set3 setColor:[UIColor redColor]];
+            set3.drawFilledEnabled = NO;//是否填充颜色
+            set3.drawCirclesEnabled = NO;//是否绘制拐点
+            set3.valueColors = @[[UIColor redColor]];//折线拐点处显示数据的颜色
+            set3.drawCircleHoleEnabled = NO;//是否绘制中间的空心
+            set3.highlightEnabled = NO;
+            set3.fillColor = [UIColor redColor];//填充颜色
+            set3.fillAlpha = 0.1;//填充颜色的透明度
+            [set3 setColor:RGB(255, 0, 0)];//折线颜色
+        }
         [dataSets addObject:set3];
-        
+    
         //创建 LineChartData 对象, 此对象就是lineChartView需要最终数据对象
         
         LineChartData *data = [[LineChartData alloc] initWithDataSets:dataSets];
         [data setValueFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:8.f]];//文字字体
-        [data setValueTextColor:[UIColor grayColor]];//文字颜色
-        
+//        [data setValueTextColor:[UIColor grayColor]];//文字颜色
+    
         return data;
-    }
+    
 
 }
 

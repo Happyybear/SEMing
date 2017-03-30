@@ -25,6 +25,7 @@
     NSMutableArray *_dataSource;//数据数组
     NSMutableArray *_timeArray;//时间数组
     NSMutableArray *_nameArray;//名字数组
+    NSMutableArray *_displaySource;//名字数组
 }
 
 @property (nonatomic,strong) NSMutableArray *timeArr;
@@ -48,7 +49,8 @@
     }else{
         //点击表的通知
         [self createTableView];
-//        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(clickMp:) name:@"selected" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(clickMp:) name:@"selected" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(clickAllMp:) name:@"selectedAll" object:nil];
         [self loadData];
         [self createBaseUI];
         [self initDict];
@@ -64,8 +66,29 @@
 
 - (void)initData{
     _dataSource = [NSMutableArray array];
+    _displaySource = [NSMutableArray array];
     _timeArray = [NSMutableArray array];
     _nameArray = [NSMutableArray array];
+}
+
+- (void)clickAllMp:(NSNotification *)notification
+{
+    NSMutableArray * memArr = [NSMutableArray array];
+    memArr = [HY_NSusefDefaults objectForKey:@"selectBtn"];
+    if (memArr.count > 0) {
+        //首先初始化数组并移除原来的tableView
+        _displaySource = [NSMutableArray array];
+        NSMutableArray * arr = _dataSource;
+        for (int i = 0; i < arr.count; i++) {
+            DeviceModel * de = _dataSource[i];
+            for(int j = 0; j<memArr.count; j++){
+                if ([de.De_addr isEqualToString:memArr[j]]) {
+                    [_displaySource addObject: de];
+                }
+            }
+        }
+        [self.tableView reloadData];
+    }
 }
 - (void)clickMp:(NSNotification *)notification
 {
@@ -96,56 +119,16 @@
 - (void)refreshTableView:(NSString *)mpID :(NSString *)mpName
 {
     //首先初始化数组并移除原来的tableView
-    [_tableView removeFromSuperview];
-    _dataSource = [NSMutableArray array];
-    _timeArray = [NSMutableArray array];
-    _nameArray = [NSMutableArray array];
+    _displaySource = [NSMutableArray array];
     HYSingleManager *manager = [HYSingleManager sharedManager];
-    NSDictionary *dict = manager.powerFactor_dict[mpID];
-    for (int k = _days-1; k>=0; k--) {
-        NSArray *array = dict[[NSString stringWithFormat:@"%d",k]];
-        for (int n = 0; n<array.count; n++) {
-            [_dataSource addObject:[NSString stringWithFormat:@"%@",array[n]]];
+    NSMutableArray * arr = _dataSource;
+    for (int i = 0; i < arr.count; i++) {
+        DeviceModel * de = _dataSource[i];
+        if ([de.De_addr isEqualToString:mpID]) {
+            [_displaySource addObject: de];
         }
     }
-    //时间
-    NSArray *time = [self getCurrentTime:_days];
-    NSMutableArray *a = [NSMutableArray array];
-    _timeArray = [NSMutableArray array];
-    for (int i = 0; i<time.count; i++) {
-        NSArray *arr = time[i];
-        if (i == (time.count -1)) {
-            int hour = [self getCurrentHour];
-            for (int j = 0; j<hour; j++) {
-                NSString *str1 = [NSString stringWithFormat:@"%@-%@ %02d:00",arr[3],arr[4],j];
-                [a addObject:str1];
-                NSString *str2 = [NSString stringWithFormat:@"%@-%@ %02d:15",arr[3],arr[4],j];
-                [a addObject:str2];
-                NSString *str3 = [NSString stringWithFormat:@"%@-%@ %02d:30",arr[3],arr[4],j];
-                [a addObject:str3];
-                NSString *str4 = [NSString stringWithFormat:@"%@-%@ %02d:45",arr[3],arr[4],j];
-                [a addObject:str4];
-            }
-        }else{
-            for (int k = 0; k<24; k++) {
-                NSString *str1 = [NSString stringWithFormat:@"%@-%@ %02d:00",arr[3],arr[4],k];
-                [a addObject:str1];
-                NSString *str2 = [NSString stringWithFormat:@"%@-%@ %02d:15",arr[3],arr[4],k];
-                [a addObject:str2];
-                NSString *str3 = [NSString stringWithFormat:@"%@-%@ %02d:30",arr[3],arr[4],k];
-                [a addObject:str3];
-                NSString *str4 = [NSString stringWithFormat:@"%@-%@ %02d:45",arr[3],arr[4],k];
-                [a addObject:str4];
-            }
-        }
-    }
-    for (int j = 0; j<a.count; j++) {
-        [_timeArray addObject:a[j]];
-    }
-    //表名字
-    for (int i = 0; i<_timeArray.count; i++) {
-        [_nameArray addObject:mpName];
-    }
+    [self.tableView reloadData];
 }
 
 - (void)createLastSearchUI
@@ -157,10 +140,11 @@
     NSNumber *number = [defaults objectForKey:@"whichBtn"];
     NSString *string = [NSString stringWithFormat:@"%@",number];
     HYScoketManage * manager = [HYScoketManage shareManager];
+    [SVProgressHUD showWithStatus:@"加载中.."];
     if ([self isBlankString:string]) {
         _days = 1;
         self.timeArr = [self getCurrentTime:_days];
-        [manager getNetworkDatawithIP:ipv6Addr withTag:@"3"];
+        [manager getNetworkDatawithIP:ipv6Addr withTag:@"5"];
         [manager writeDataToHostStatusWithTimeArr:self.timeArr WithRequest_type:6];
     }else{
         int value = [number intValue];
@@ -169,7 +153,7 @@
             {
                 _days = 1;
                 self.timeArr = [self getCurrentTime:_days];
-                [manager getNetworkDatawithIP:ipv6Addr withTag:@"3"];
+                [manager getNetworkDatawithIP:ipv6Addr withTag:@"5"];
                 [manager writeDataToHostStatusWithTimeArr:self.timeArr WithRequest_type:6];
                 break;
             }
@@ -177,7 +161,7 @@
             {
                 _days = 3;
                 self.timeArr = [self getCurrentTime:_days];
-                [manager getNetworkDatawithIP:ipv6Addr withTag:@"3"];
+                [manager getNetworkDatawithIP:ipv6Addr withTag:@"5"];
                 [manager writeDataToHostStatusWithTimeArr:self.timeArr WithRequest_type:6];
                 break;
             }
@@ -185,7 +169,7 @@
             {
                 _days = 7;
                 self.timeArr = [self getCurrentTime:_days];
-                [manager getNetworkDatawithIP:ipv6Addr withTag:@"3"];
+                [manager getNetworkDatawithIP:ipv6Addr withTag:@"5"];
                 [manager writeDataToHostStatusWithTimeArr:self.timeArr WithRequest_type:6];
                 break;
             }
@@ -255,7 +239,7 @@
 }
 
 - (void)loadData{
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(createDataSource) name:@"getStatusData" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(createDataSource) name:@"getWUgongData" object:nil];
 }
 
 - (void)createDataSource
@@ -263,6 +247,7 @@
     [self initData];
     HYSingleManager * manager = [HYSingleManager sharedManager];
     _dataSource = manager.memory_Array;
+    _displaySource = _dataSource;
     [SVProgressHUD showSuccessWithStatus:@"通讯成功"];
     [SVProgressHUD dismiss];
     //功率因数
@@ -331,10 +316,11 @@
 
 - (void)createTableView
 {
-    _tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 30, SCREEN_W, SCREEN_H) style:UITableViewStylePlain];
+    _tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 30, SCREEN_W, SCREEN_H - 76) style:UITableViewStylePlain];
     _tableView.backgroundColor = [UIColor whiteColor];
     _tableView.delegate = self;
     _tableView.dataSource = self;
+    _tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
     [self.view addSubview:_tableView];
 }
 
@@ -346,7 +332,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    DeviceModel * de = _dataSource[section];
+    DeviceModel * de = _displaySource[section];
     int num = 0;
     for (DateModel * date in de.dataArr) {
         for (DataModel * data in date.data) {
@@ -357,7 +343,7 @@
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
-    return _dataSource.count;
+    return _displaySource.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -370,11 +356,11 @@
     
     //设置timeLabel字体大小
     [cell.timeLabel setFont:[UIFont systemFontOfSize:11]];
-    DeviceModel * de = _dataSource[indexPath.section];
+    DeviceModel * de = _displaySource[indexPath.section];
     DateModel * date = de.dataArr[(indexPath.row ) / 96];
     int num = indexPath.row % 96;
     DataModel * data = date.data[num];
-    NSString * label1Data, *label2Data ,* label3Data, * timeString;
+    NSString * label1Data;
     label1Data =data.powerFactor;
     [cell setNameLabel:data.name timeLabel:_timeArray[indexPath.row] tableCodeLabel:label1Data];
     
@@ -454,7 +440,7 @@
         [self initDict];
         _days = 1;
         self.timeArr = [self getCurrentTime:_days];
-        [manager getNetworkDatawithIP:ipv6Addr withTag:@"3"];
+        [manager getNetworkDatawithIP:ipv6Addr withTag:@"5"];
         [manager writeDataToHostStatusWithTimeArr:self.timeArr WithRequest_type:6];
     }else if ([btn2 isSelected]){
         //三天
@@ -466,7 +452,7 @@
         [self initDict];
         _days = 3;
         self.timeArr = [self getCurrentTime:_days];
-        [manager getNetworkDatawithIP:ipv6Addr withTag:@"3"];
+        [manager getNetworkDatawithIP:ipv6Addr withTag:@"5"];
         [manager writeDataToHostStatusWithTimeArr:self.timeArr WithRequest_type:6];
     }else if ([btn3 isSelected]){
         //一周
@@ -478,7 +464,7 @@
         [self initDict];
         _days = 7;
         self.timeArr = [self getCurrentTime:_days];
-        [manager getNetworkDatawithIP:ipv6Addr withTag:@"3"];
+        [manager getNetworkDatawithIP:ipv6Addr withTag:@"5"];
         [manager writeDataToHostStatusWithTimeArr:self.timeArr WithRequest_type:6];
     }
     

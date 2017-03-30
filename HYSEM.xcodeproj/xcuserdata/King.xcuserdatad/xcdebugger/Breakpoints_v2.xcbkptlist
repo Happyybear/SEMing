@@ -191,7 +191,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "527"
             endingLineNumber = "527"
-            landmarkName = "-isFinished"
+            landmarkName = "-createDataSource1"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -399,7 +399,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2119"
             endingLineNumber = "2119"
-            landmarkName = "-setData"
+            landmarkName = "-dealChartDataWithFlag:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -591,7 +591,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1320"
             endingLineNumber = "1320"
-            landmarkName = "-tableView:cellForRowAtIndexPath:"
+            landmarkName = "-compare:::"
             landmarkType = "7">
             <Locations>
                <Location

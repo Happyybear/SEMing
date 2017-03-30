@@ -101,7 +101,6 @@
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:userNameText.text forKey:@"username"];
     [defaults setObject:passWordText.text forKey:@"password"];
-    NSLog(@"qq%@",passWordText.text);
 //    [_sendSocket connectToHost:ipv6Addr onPort:SocketonPort withTimeout:-1 error:nil];
     [self putSocket];
     [SVProgressHUD showWithStatus:@"正在登陆"];
@@ -122,6 +121,7 @@
 
     [self performSelector:@selector(SingInFirstView) withObject:nil afterDelay:1];
 }
+
 -(NSString *)convertHostToAddress:(NSString *)host {
     
     NSError *err = nil;

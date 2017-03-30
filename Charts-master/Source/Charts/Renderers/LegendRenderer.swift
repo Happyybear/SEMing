@@ -567,10 +567,14 @@ open class LegendRenderer: Renderer
             context.strokeLineSegments(between: _formLineSegmentsBuffer)
         }
     }
-
+// MARK: label上的数字
     /// Draws the provided label at the given position.
     open func drawLabel(context: CGContext, x: CGFloat, y: CGFloat, label: String, font: NSUIFont, textColor: NSUIColor)
     {
         ChartUtils.drawText(context: context, text: label, point: CGPoint(x: x, y: y), align: .left, attributes: [NSFontAttributeName: font, NSForegroundColorAttributeName: textColor])
+        
+        NSLog("%f--%f---", x,y);
     }
+
+    
 }

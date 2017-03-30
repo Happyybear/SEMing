@@ -11,6 +11,8 @@
 #import "HYScoketManage.h"
 #import "DeviceModel.h"
 #import "DataModel.h"
+#include <sys/types.h>
+#include <sys/sysctl.h>
 @interface HYUsePowerViewController ()<TWlALertviewDelegate,UITableViewDelegate,UITableViewDataSource>
 {
     GCDAsyncSocket *_sendSocket;
@@ -24,6 +26,7 @@
     NSMutableArray *_timeArr;
     int request_type;//区分请求类型,全天查询还是分段查询 (0 全天  1 分段)
     NSString *ipv6Addr;
+    int dayNum; //选择的天数
 }
 
 @property (nonatomic,strong) NSMutableArray *timeArray;
@@ -104,6 +107,7 @@
         HYScoketManage * manage = [HYScoketManage shareManager];
         [manage getNetworkDatawithIP:ipv6Addr withTag:@"2"];
         [SVProgressHUD showWithStatus:@"通讯中..."];
+        dayNum = 3;
         [manage writeDataToHostWithL:@"3"];
         [self cancleView];
         //
@@ -115,6 +119,7 @@
         _sendSocket = [[GCDAsyncSocket alloc]initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
         [_sendSocket connectToHost:ipv6Addr onPort:SocketonPort withTimeout:10 error:nil];
         request_type = 1;
+        dayNum = 3;
         self.timeArray = [self compare:[a intValue] :[b intValue] :3];
         [SVProgressHUD showWithStatus:@"通讯中..."];
         [self writeDataToHost];
@@ -126,6 +131,7 @@
         NSString *b = [[NSUserDefaults standardUserDefaults] objectForKey:@"end2"];
         NSString *c = [[NSUserDefaults standardUserDefaults] objectForKey:@"st3"];
         NSString *d = [[NSUserDefaults standardUserDefaults] objectForKey:@"end3"];
+        dayNum = 3;
         NSArray *arr1 = [self compare:[a intValue] :[b intValue] :3];
         NSArray *arr2 = [self compare:[c intValue] :[d intValue] :3];
         [self removeTableViewAndArray];
@@ -150,7 +156,7 @@
         NSString *d = [[NSUserDefaults standardUserDefaults] objectForKey:@"end5"];
         NSString *e = [[NSUserDefaults standardUserDefaults] objectForKey:@"st6"];
         NSString *f = [[NSUserDefaults standardUserDefaults] objectForKey:@"end6"];
-        
+        dayNum = 3;
         NSArray *arr1 = [self compare:[a intValue] :[b intValue] :3];
         NSArray *arr2 = [self compare:[c intValue] :[d intValue] :3];
         NSArray *arr3 = [self compare:[e intValue] :[f intValue] :3];
@@ -179,6 +185,7 @@
         request_type = 0;
         [manage getNetworkDatawithIP:ipv6Addr withTag:@"2"];
         [SVProgressHUD showWithStatus:@"通讯中..."];
+        dayNum = 7;
         [manage writeDataToHostWithL:@"7"];
         [self cancleView];
         
@@ -186,6 +193,7 @@
         [self removeTableViewAndArray];
         NSString *a = [[NSUserDefaults standardUserDefaults] objectForKey:@"st1"];
         NSString *b = [[NSUserDefaults standardUserDefaults] objectForKey:@"end1"];
+        dayNum = 7;
         self.timeArray = [self compare:[a intValue] :[b intValue] :7];
         _sendSocket = [[GCDAsyncSocket alloc]initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
         [_sendSocket connectToHost:ipv6Addr onPort:SocketonPort withTimeout:10 error:nil];
@@ -199,7 +207,7 @@
         NSString *b = [[NSUserDefaults standardUserDefaults] objectForKey:@"end2"];
         NSString *c = [[NSUserDefaults standardUserDefaults] objectForKey:@"st3"];
         NSString *d = [[NSUserDefaults standardUserDefaults] objectForKey:@"end3"];
-
+        dayNum = 7;
         NSArray *arr1 = [self compare:[a intValue] :[b intValue] :7];
         NSArray *arr2 = [self compare:[c intValue] :[d intValue] :7];
         [self removeTableViewAndArray];
@@ -224,7 +232,7 @@
         NSString *d = [[NSUserDefaults standardUserDefaults] objectForKey:@"end5"];
         NSString *e = [[NSUserDefaults standardUserDefaults] objectForKey:@"st6"];
         NSString *f = [[NSUserDefaults standardUserDefaults] objectForKey:@"end6"];
-        
+        dayNum = 7;
         NSArray *arr1 = [self compare:[a intValue] :[b intValue] :7];
         NSArray *arr2 = [self compare:[c intValue] :[d intValue] :7];
         NSArray *arr3 = [self compare:[e intValue] :[f intValue] :7];
@@ -263,6 +271,7 @@
     _data = [NSMutableArray array];
     isAppend = 0;
     appendLen = 0;
+    [HY_NSusefDefaults removeObjectForKey:@"NextData"];
     mData = [[NSMutableData alloc]init];
     //首先初始化存放用量的字典
     HYSingleManager *manager = [HYSingleManager sharedManager];
@@ -319,7 +328,7 @@
     //判断所有数据是否请求完成
     BOOL ret = [self isFinished];
     if (ret) {
-        [self getData];
+        [self createDataSource1];
     }
     
     [sock readDataWithTimeout:10 tag:0];
@@ -333,7 +342,6 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(createDataSource) name:@"getData" object:nil];
     }else{
         //分段
-        [self createDataSource1];
     }
     
 }
@@ -341,24 +349,39 @@
     [SVProgressHUD dismiss];
     NSData * data = [HY_NSusefDefaults objectForKey:@"usePowerData"];
     NSArray * dataArr = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    int min= 0,position =0;
     for (DeviceModel * model  in dataArr) {
-        for (int i = 0; i < model.dataArr.count - 1; i++) {
+        for (int i = 0; i < model.dataArr.count -1 ; i++) {
             DataModel * data = model.dataArr[i];
-            int num1 = [data.mm intValue] + [data.day intValue] *24 + [data.Month intValue] * 30;
+             min =  [data.day intValue] *24 + [data.Month intValue] * 30 * 24 +[data.hour intValue];
+            position = i;
             for (int j = i + 1; j < model.dataArr.count; j++) {
-                DataModel * data2 = model.dataArr[i];
-                int num2 = [data2.mm intValue] + [data2.day intValue] *24 + [data2.Month intValue] * 30;
-                if (num1 < num2) {
-                    DataModel * temp = model.dataArr[i];
-                    model.dataArr[i] = model.dataArr[j];
-                    model.dataArr[i] = temp;
+                DataModel * data2 = model.dataArr[j];
+                int num2 =  [data2.day intValue] *24 + [data2.Month intValue] * 30 * 24 +[data2.hour intValue];
+                if (min > num2) {
+                    min = num2;
+                    position = j;
                 }
+            }
+            if (position != i) {
+                DataModel * temp = model.dataArr[i];
+                model.dataArr[i] = model.dataArr[position];
+                model.dataArr[position] = temp;
             }
         }
     }
     _data = dataArr;
-    
-    //计算用量
+    //时间
+    for (int j = 0; j<dataArr.count; j++) {
+        for (int i = dayNum-1; i >= 0; i--) {
+            NSDate * currentDate = [NSDate dateWithTimeIntervalSinceNow:-(60*60*24)*i];
+            NSDateFormatter * dateFormatter =[[NSDateFormatter alloc] init];
+            [dateFormatter setDateFormat:@"MM-dd"];
+            NSString * time = [dateFormatter stringFromDate:currentDate];
+            [_timeArr addObject:time];
+        }
+    }
+        //计算用量
     for (DeviceModel * de in _data)
     {
         for (int i = 0; i<de.dataArr.count - 1; i++)
@@ -366,14 +389,33 @@
             DataModel * data = de.dataArr[i];
             int j = i +1;
             DataModel * data1 = de.dataArr[j];
-            double count = [data1.data doubleValue] * [data1.ct doubleValue] * [data1.pt doubleValue] - [data.data doubleValue] * [data.ct doubleValue] * [data.pt doubleValue];
-            NSString * countString = [NSString stringWithFormat:@"%f",count];
+            double count = 0;
+            NSString * countString = [[NSString alloc] init];
+            if ([self isFloatText:data1.data] && [self isFloatText:data.data]) {
+                count = [data1.data doubleValue] * [data1.ct doubleValue] * [data1.pt doubleValue] - [data.data doubleValue] * [data.ct doubleValue] * [data.pt doubleValue];
+                countString = [NSString stringWithFormat:@"%f",count];
+            }else{
+                countString = @"--------";
+            }
+            
             [_dataSource addObject:countString];
             
         }
     }
     [self.tableView reloadData];
 }
+
+- (BOOL)isFloatText:(NSString *)str{
+    NSString * regex        = @"^[0-9]*[.][0-9]*$";
+    NSPredicate * pred      = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
+    BOOL isMatch            = [pred evaluateWithObject:str];
+    if (isMatch) {
+        return YES;
+    }else{
+        return NO;
+    }
+}
+
 - (void)createDataSource1
 {
     HYSingleManager *single = [HYSingleManager sharedManager];
@@ -402,7 +444,35 @@
     return (NSComparisonResult)NSOrderedSame;
         
     };
+    ////时间处理
+    NSMutableArray * dayArr = [self getCurrentDay];
+    NSMutableArray * dealTime = [[NSMutableArray alloc] init];
+    for (int d = 0; d < dayNum; d++) {
+        for (int i = 0; i<self.timeArray.count/2; i++)
+        {
+            if ([dayArr[d] intValue] == [self.timeArray[i*2][2] intValue] ) {
+                [dealTime addObject:self.timeArray[i*2]];
+                [dealTime addObject:self.timeArray[i*2+1]];
+            }
+        }
+    }
+
+    _timeArray = dealTime;
+    ////时间处理
     
+    NSMutableArray * valueArrary = [[NSMutableArray alloc]init];
+    for (int i = 0; i < name_ID.count; i++) {
+        CMPModel *mp = [self FindMpCTAndPT:name_ID[i]];
+        NSDictionary *dict = [single.usepower_dict objectForKey:name_ID[i]];
+        NSMutableArray * arr = [[NSMutableArray alloc] init];
+        for (int j = 0; j < _timeArray.count; j++) {
+            NSArray * time = _timeArray[j];
+            NSString * date1 = [NSString stringWithFormat:@"%@%@%@%02d",time[0],time[1],time[2],[time[3] intValue]];
+            [arr addObject:dict[date1]];
+            NSLog(@"%@",date1);
+        }
+        [valueArrary addObject:arr];
+    }
     
     for (int i = 0; i<name_ID.count; i++) {
         CMPModel *mp = [self FindMpCTAndPT:name_ID[i]];
@@ -417,9 +487,9 @@
         double CTPT = mp.mp_CT*mp.mp_PT;
         if (request_type == 0) {
             for (int j = 0; j<outputAfter.count-1; j++) {
-                NSString *str1 = [dict objectForKey:outputAfter[j+1]][0];
+                NSString *str1 = valueArrary[i][j][0];
                 BOOL ret1 = [self judgeTableCode:[NSString stringWithFormat:@"%@",str1]];
-                NSString *str = [dict objectForKey:outputAfter[j]][0];
+                NSString *str = valueArrary[i][j+1][0];
                 BOOL ret = [self judgeTableCode:[NSString stringWithFormat:@"%@",str]];
                 if (ret1&&ret) {
                     double code = [str1 doubleValue]*CTPT - [str doubleValue]*CTPT;
@@ -434,27 +504,27 @@
             }
 
         }else{
-            for (int j = 0; j<outputAfter.count/2; j++) {
-                NSString *str1 = [dict objectForKey:outputAfter[2*j+1]][0];
+            NSArray * value = valueArrary[i];
+            for (int j = 0; j<value.count/2; j++) {
+                NSString *str1 = value[j * 2 + 1][0];
                 BOOL ret1 = [self judgeTableCode:[NSString stringWithFormat:@"%@",str1]];
-                NSString *str = [dict objectForKey:outputAfter[2*j]][0];
+                NSString *str = value[j * 2][0];
                 BOOL ret = [self judgeTableCode:[NSString stringWithFormat:@"%@",str]];
+
                 if (ret1&&ret) {
                     double code = [str1 doubleValue]*CTPT - [str doubleValue]*CTPT;
                     [_dataSource addObject:[NSString stringWithFormat:@"%.4f",code]];
                 }else{
                     [_dataSource addObject:[NSString stringWithFormat:@"---------"]];
                 }
-                NSString *month1 = [outputAfter[2*j+1] substringWithRange:NSMakeRange(2, 2)];
-                NSString *day1 = [outputAfter[2*j+1] substringWithRange:NSMakeRange(4, 2)];
-                NSString *hour1 = [outputAfter[2*j+1] substringWithRange:NSMakeRange(6, 2)];
-                NSString *month = [outputAfter[2*j] substringWithRange:NSMakeRange(2, 2)];
-                NSString *day = [outputAfter[2*j] substringWithRange:NSMakeRange(4, 2)];
-                NSString *hour = [outputAfter[2*j] substringWithRange:NSMakeRange(6, 2)];
-                [_timeArr addObject:[NSString stringWithFormat:@"%@-%@ %@ %@-%@ %@",month,day,hour,month1,day1,hour1]];
                 [_nameArr addObject:mp.name];
             }
         }
+        //时间
+        for (int i = 0; i <self.timeArray.count / 2; i++) {
+            [_timeArr addObject:[NSString stringWithFormat:@"%@-%@ %@ %@-%@ %@",self.timeArray[i * 2][1],self.timeArray[i*2 ][2],self.timeArray[i * 2][3],self.timeArray[i * 2 + 1][1],self.timeArray[i * 2 + 1][2],self.timeArray[i * 2 + 1][3]]];
+        }
+
     }
     [SVProgressHUD showSuccessWithStatus:@"通讯成功"];
     [SVProgressHUD dismiss];
@@ -499,7 +569,7 @@
 }
 
 - (BOOL)isNumText:(NSString *)str{
-    NSString * regex        = @"(/^[0-9]*$/)";
+    NSString * regex        = @"^[0-1]\\d|2[0-3]|\\d$";
     NSPredicate * pred      = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
     BOOL isMatch            = [pred evaluateWithObject:str];
     if (isMatch) {
@@ -507,7 +577,6 @@
     }else{
         return NO;
     }
-    
 }
 
 
@@ -527,9 +596,17 @@
         }
     }
     NSArray *allKeys = [single.usepower_dict allKeys];
+    NSMutableArray * timeArray = [[NSMutableArray alloc] init];
+    for (int i = 0; i< self.timeArray.count; i++) {
+        NSArray * t = self.timeArray[i];
+        NSString * tS = [NSString stringWithFormat:@"%@%@",t[2],t[3]];
+        if (![timeArray containsObject:tS]) {
+            [timeArray addObject:tS];
+        }
+    }
     for (int i = 0; i<allKeys.count; i++) {
         NSDictionary *dict = single.usepower_dict[allKeys[i]];
-        if (!([[dict allValues] count] == self.timeArray.count)) {
+        if (!([[dict allValues] count] == timeArray.count)) {
             return NO;
         }
     }
@@ -746,7 +823,53 @@
     alertView.delegate = self;
     UIView *keywindow = [[UIApplication sharedApplication] keyWindow];
     [keywindow addSubview:alertView];
+    [self dealKeyBoard];
     
+}
+#pragma mark --处理键盘弹起
+- (void)dealKeyBoard
+{
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+}
+
+- (void)keyboardWillHide:(NSNotification *)notification
+{
+    NSValue *animationDurationValue = [[notification userInfo] objectForKey:UIKeyboardAnimationDurationUserInfoKey];
+    NSTimeInterval animationDuration;
+    [animationDurationValue getValue:&animationDuration];
+    [UIView animateWithDuration:animationDuration animations:^{
+        alertView.frame = CGRectMake(0, 0, SCREEN_W, SCREEN_H );
+    } completion:^(BOOL finished) {
+        
+    }];
+}
+
+- (void)keyboardWillShow:(NSNotification *)notification
+{
+    CGRect keyBoardFrame = [[[notification userInfo] objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
+     NSValue *animationDurationValue = [[notification userInfo] objectForKey:UIKeyboardAnimationDurationUserInfoKey];
+    [self beginMoveAnimition:keyBoardFrame andAnimitionDurationValue:animationDurationValue];
+}
+
+-(void)beginMoveAnimition:(CGRect)keyBoardFrame andAnimitionDurationValue:(NSValue *)animationDurationValue
+{
+    NSTimeInterval animationDuration;
+    [animationDurationValue getValue:&animationDuration];
+    if ([[self getCurrentDeviceModel] isEqualToString:@"iPhone4"] || [[self getCurrentDeviceModel] isEqualToString:@"iPhone4s"] || [[self getCurrentDeviceModel] isEqualToString:@"iPhone5"] || [[self getCurrentDeviceModel] isEqualToString:@"iPhone5s"] ||[[self getCurrentDeviceModel] isEqualToString:@"iPhone5c"]) {
+        [UIView animateWithDuration:animationDuration animations:^{
+            alertView.frame = CGRectMake(0, -(keyBoardFrame.origin.y -(self.view.center.y-keyBoardFrame.size.height + 190) - 20 ), SCREEN_W, SCREEN_H );
+        } completion:^(BOOL finished) {
+            
+        }];
+
+    }else{
+        [UIView animateWithDuration:animationDuration animations:^{
+            alertView.frame = CGRectMake(0, -40, SCREEN_W, SCREEN_H );
+        } completion:^(BOOL finished) {
+            
+        }];
+    }
 }
 
 -(void)didClickButtonAtIndex:(NSUInteger)index password:(NSString *)password{
@@ -804,20 +927,18 @@
         //移除tableview并且清空数据源
         [self removeTableViewAndArray];
         request_type = 0;
+        dayNum = 3;
         HYScoketManage * manage = [HYScoketManage shareManager];
         [manage getNetworkDatawithIP:ipv6Addr withTag:@"2"];
         [SVProgressHUD showWithStatus:@"通讯中..."];
         [manage writeDataToHostWithL:@"3"];
         [self cancleView];
-
-//        _sendSocket = [[GCDAsyncSocket alloc]initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
-//        [_sendSocket connectToHost:ipv6Addr onPort:SocketonPort withTimeout:10 error:nil];
-//        
-//        request_type = 0;
-//        self.timeArray = [self returnTimeArray:3];
     }else if ([btn1 isSelected]&&[btn4 isSelected]){
         if (![alertView.startF1.text isEqualToString:@""] && ![alertView.endF1.text isEqualToString:@""]) {
-            
+            if (!([self isNumText:alertView.startF1.text] && [self isNumText:alertView.endF1.text] )) {
+                [UIView addMJNotifierWithText:@"请输入正确的时间" dismissAutomatically:YES];
+                return;
+            }
             [defaults setBool:btn1.selected forKey:@"santian"];
             [defaults setBool:btn4.selected forKey:@"yiduan"];
             [defaults removeObjectForKey:@"yizhou"];
@@ -826,6 +947,7 @@
             [defaults removeObjectForKey:@"sanduan"];
             [defaults synchronize];
              [self removeTableViewAndArray];
+            dayNum = 3;
             _sendSocket = [[GCDAsyncSocket alloc]initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
             [_sendSocket connectToHost:ipv6Addr onPort:SocketonPort withTimeout:10 error:nil];
             request_type = 1;
@@ -841,7 +963,10 @@
         }
     }else if ([btn1 isSelected]&&[btn5 isSelected]){
         if (![alertView.startF2.text isEqualToString:@""] && ![alertView.endF2.text isEqualToString:@""]&&![alertView.startF3.text isEqualToString:@""] &&! [alertView.endF3.text isEqualToString:@""]) {
-            
+            if (!([self isNumText:alertView.startF2.text] && [self isNumText:alertView.endF2.text] && [self isNumText:alertView.startF3.text] && [self isNumText:alertView.endF3.text])) {
+                [UIView addMJNotifierWithText:@"请输入正确的时间" dismissAutomatically:YES];
+                return;
+            }
             if (user_type == 4) {
                 //提示失败
                 [UIView addMJNotifierWithText:@"对不起,权限不够" dismissAutomatically:YES];
@@ -857,6 +982,7 @@
                 _sendSocket = [[GCDAsyncSocket alloc]initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
                 [_sendSocket connectToHost:ipv6Addr onPort:SocketonPort withTimeout:10 error:nil];
                 request_type = 1;
+                dayNum = 3;
                 int start2 = [alertView.startF2.text intValue];
                 int end2 = [alertView.endF2.text intValue];
                 int start3 = [alertView.startF3.text intValue];
@@ -879,6 +1005,11 @@
         }
     }else if ([btn1 isSelected] && [btn6 isSelected]){
         if (![alertView.startF4.text isEqualToString:@""] && ![alertView.endF4.text isEqualToString:@""] && ![alertView.startF5.text isEqualToString:@""] && ![alertView.endF5.text isEqualToString:@""] && ![alertView.startF6.text isEqualToString:@""] && ![alertView.endF6.text isEqualToString:@""]) {
+            
+            if (!([self isNumText:alertView.startF4.text] && [self isNumText:alertView.endF4.text]&&[self isNumText:alertView.startF5.text] && [self isNumText:alertView.endF5.text]&&[self isNumText:alertView.startF6.text] && [self isNumText:alertView.endF6.text])) {
+                [UIView addMJNotifierWithText:@"请输入正确的时间" dismissAutomatically:YES];
+                return;
+            }
             if (user_type == 4) {
                 //提示
                 [UIView addMJNotifierWithText:@"对不起,权限不够" dismissAutomatically:YES];
@@ -900,6 +1031,7 @@
                 int end5 = [alertView.endF5.text intValue];
                 int start6 = [alertView.startF6.text intValue];
                 int end6 = [alertView.endF6.text intValue];
+                dayNum = 3;
                 NSArray *arr1 = [self compare:start4 :end4 :3];
                 NSArray *arr2 = [self compare:start5 :end5 :3];
                 NSArray *arr3 = [self compare:start6 :end6 :3];
@@ -935,14 +1067,8 @@
             [defaults removeObjectForKey:@"liangduan"];
             [defaults synchronize];
              [self removeTableViewAndArray];
-//            _sendSocket = [[GCDAsyncSocket alloc]initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
-//            [_sendSocket connectToHost:ipv6Addr onPort:SocketonPort withTimeout:10 error:nil];
-//            request_type = 0;
-//            self.timeArray = [self returnTimeArray:7];
-//            [SVProgressHUD showWithStatus:@"通讯中..."];
-//            [self writeDataToHost];
-//            [self cancleView];
             request_type = 0;
+            dayNum = 7;
             HYScoketManage * manage = [HYScoketManage shareManager];
             [manage getNetworkDatawithIP:ipv6Addr withTag:@"2"];
             [SVProgressHUD showWithStatus:@"通讯中..."];
@@ -954,6 +1080,10 @@
     }else if ([btn2 isSelected] && [btn4 isSelected]){
         if (![alertView.startF1.text isEqualToString:@""] && ![alertView.endF1.text isEqualToString:@""]) {
             
+            if (!([self isNumText:alertView.startF1.text] && [self isNumText:alertView.endF1.text])) {
+                [UIView addMJNotifierWithText:@"请输入正确的时间" dismissAutomatically:YES];
+                return;
+            }
             if (user_type == 4) {
                 //提示
                 [UIView addMJNotifierWithText:@"对不起,权限不够" dismissAutomatically:YES];
@@ -971,6 +1101,7 @@
                 request_type = 1;
                 int start1 = [alertView.startF1.text intValue];
                 int end1 = [alertView.endF1.text intValue];
+                dayNum = 7;
                 self.timeArray = [self compare:start1 :end1 :7];
                 [SVProgressHUD showWithStatus:@"通讯中..."];
                 [self writeDataToHost];
@@ -984,6 +1115,11 @@
     }else if ([btn2 isSelected] && [btn5 isSelected]){
         if (![alertView.startF2.text isEqualToString:@""] && ![alertView.endF2.text isEqualToString:@""]&&![alertView.startF3.text isEqualToString:@""] &&! [alertView.endF3.text isEqualToString:@""]) {
             
+            if (!([self isNumText:alertView.startF2.text] && [self isNumText:alertView.endF2.text] && [self isNumText:alertView.startF3.text] && [self isNumText:alertView.endF3.text])) {
+                [UIView addMJNotifierWithText:@"请输入正确的时间" dismissAutomatically:YES];
+                return;
+            }
+
             if (user_type == 4) {
                 //提示
                 [UIView addMJNotifierWithText:@"对不起,权限不够" dismissAutomatically:YES];
@@ -1003,6 +1139,7 @@
                 int end2 = [alertView.endF2.text intValue];
                 int start3 = [alertView.startF3.text intValue];
                 int end3 = [alertView.endF3.text intValue];
+                dayNum = 7;
                 NSArray *arr1 = [self compare:start2 :end2 :7];
                 NSArray *arr2 = [self compare:start3 :end3 :7];
                 for (int i = 0; i<arr1.count; i++) {
@@ -1022,7 +1159,10 @@
         }
     }else if ([btn2 isSelected] && [btn6 isSelected]){
         if (![alertView.startF4.text isEqualToString:@""] && ![alertView.endF4.text isEqualToString:@""] && ![alertView.startF5.text isEqualToString:@""] && ![alertView.endF5.text isEqualToString:@""] && ![alertView.startF6.text isEqualToString:@""] && ![alertView.endF6.text isEqualToString:@""]) {
-            
+            if (!([self isNumText:alertView.startF4.text] && [self isNumText:alertView.startF5.text] && [self isNumText:alertView.startF6.text] && [self isNumText:alertView.endF4.text] && [self isNumText:alertView.endF5.text] && [self isNumText:alertView.endF6.text])) {
+                [UIView addMJNotifierWithText:@"请输入正确的时间" dismissAutomatically:YES];
+                return;
+            }
             if (user_type == 4) {
                 //提示
                 [UIView addMJNotifierWithText:@"对不起,权限不够" dismissAutomatically:YES];
@@ -1044,6 +1184,7 @@
                 int end5 = [alertView.endF5.text intValue];
                 int start6 = [alertView.startF6.text intValue];
                 int end6 = [alertView.endF6.text intValue];
+                dayNum = 7;
                 NSArray *arr1 = [self compare:start4 :end4 :7];
                 NSArray *arr2 = [self compare:start5 :end5 :7];
                 NSArray *arr3 = [self compare:start6 :end6 :7];
@@ -1126,6 +1267,24 @@
     NSInteger current = (NSInteger)(currentHour);
     return current;
 }
+
+- (NSMutableArray *)getCurrentDay
+{
+    NSMutableArray * dayArr = [[NSMutableArray alloc] init];
+    for (int i = dayNum-1; i >=0 ; i--) {
+        NSDate *currentDate = [NSDate dateWithTimeIntervalSinceNow:-60*60*24*i];//获取当前时间，日期
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateFormat:@"YY/MM/dd/HH/mm"];
+        NSString *dateString = [dateFormatter stringFromDate:currentDate];
+        NSArray *arr = [dateString componentsSeparatedByString:@"/"];// '/'分割日期字符串,得到一数组
+        NSString *hexString = [NSString stringWithFormat:@"%@",[[NSString alloc] initWithFormat:@"%1lx",[arr[2] integerValue]]];
+        UInt64 currentHour = strtoull([hexString UTF8String], 0, 16);
+        NSInteger current = (NSInteger)(currentHour);
+        [dayArr addObject:[NSString stringWithFormat:@"%ld",current]];
+    }
+    return dayArr;
+}
+
 
 //输入一个整型,返回一个时间戳数组(往前推几天,并且都是零点,再加上截止到现在的时间)
 - (NSMutableArray *)returnTimeArray:(int)day
@@ -1321,8 +1480,8 @@
             for (int i = 0 ;i < de.dataArr.count - 1;i++) {
                 DataModel * data = de.dataArr[i];
                 [_nameArr addObject:data.name];
-                NSString * time = [NSString stringWithFormat:@"%@-%@",data.Month,data.day];
-                [_timeArr addObject:time];
+//                NSString * time = [NSString stringWithFormat:@"%@-%@",data.Month,data.day];
+//                [_timeArr addObject:time];
             }
         }
     }
@@ -1337,5 +1496,87 @@
     // Dispose of any resources that can be recreated.
 }
 
-
+//获得设备型号
+- (NSString *)getCurrentDeviceModel
+{
+    int mib[2];
+    size_t len;
+    char *machine;
+    
+    mib[0] = CTL_HW;
+    mib[1] = HW_MACHINE;
+    sysctl(mib, 2, NULL, &len, NULL, 0);
+    machine = malloc(len);
+    sysctl(mib, 2, machine, &len, NULL, 0);
+    
+    NSString *platform = [NSString stringWithCString:machine encoding:NSASCIIStringEncoding];
+    free(machine);
+    // iPhone
+    if ([platform isEqualToString:@"iPhone1,1"]) return @"iPhone2G";
+    if ([platform isEqualToString:@"iPhone1,2"]) return @"iPhone3G";
+    if ([platform isEqualToString:@"iPhone2,1"]) return @"iPhone3GS";
+    if ([platform isEqualToString:@"iPhone3,1"]) return @"iPhone4";
+    if ([platform isEqualToString:@"iPhone3,2"]) return @"iPhone4";
+    if ([platform isEqualToString:@"iPhone3,3"]) return @"iPhone4";
+    if ([platform isEqualToString:@"iPhone4,1"]) return @"iPhone4S";
+    if ([platform isEqualToString:@"iPhone5,1"]) return @"iPhone5";
+    if ([platform isEqualToString:@"iPhone5,2"]) return @"iPhone5";
+    if ([platform isEqualToString:@"iPhone5,3"]) return @"iPhone5c";
+    if ([platform isEqualToString:@"iPhone5,4"]) return @"iPhone5c";
+    if ([platform isEqualToString:@"iPhone6,1"]) return @"iPhone5s";
+    if ([platform isEqualToString:@"iPhone6,2"]) return @"iPhone5s";
+    if ([platform isEqualToString:@"iPhone7,2"]) return @"iPhone6";
+    if ([platform isEqualToString:@"iPhone7,1"]) return @"iPhone6Plus";
+    if ([platform isEqualToString:@"iPhone8,1"]) return @"iPhone6s";
+    if ([platform isEqualToString:@"iPhone8,2"]) return @"iPhone6sPlus";
+    if ([platform isEqualToString:@"iPhone8,3"]) return @"iPhoneSE";
+    if ([platform isEqualToString:@"iPhone8,4"]) return @"iPhoneSE";
+    if ([platform isEqualToString:@"iPhone9,1"]) return @"iPhone7";
+    if ([platform isEqualToString:@"iPhone9,2"]) return @"iPhone7Plus";
+    
+    //iPod Touch
+    if ([platform isEqualToString:@"iPod1,1"])   return @"iPodTouch";
+    if ([platform isEqualToString:@"iPod2,1"])   return @"iPodTouch2G";
+    if ([platform isEqualToString:@"iPod3,1"])   return @"iPodTouch3G";
+    if ([platform isEqualToString:@"iPod4,1"])   return @"iPodTouch4G";
+    if ([platform isEqualToString:@"iPod5,1"])   return @"iPodTouch5G";
+    if ([platform isEqualToString:@"iPod7,1"])   return @"iPodTouch6G";
+    
+    //iPad
+    if ([platform isEqualToString:@"iPad1,1"])   return @"iPad";
+    if ([platform isEqualToString:@"iPad2,1"])   return @"iPad2";
+    if ([platform isEqualToString:@"iPad2,2"])   return @"iPad2";
+    if ([platform isEqualToString:@"iPad2,3"])   return @"iPad2";
+    if ([platform isEqualToString:@"iPad2,4"])   return @"iPad2";
+    if ([platform isEqualToString:@"iPad3,1"])   return @"iPad3";
+    if ([platform isEqualToString:@"iPad3,2"])   return @"iPad3";
+    if ([platform isEqualToString:@"iPad3,3"])   return @"iPad3";
+    if ([platform isEqualToString:@"iPad3,4"])   return @"iPad4";
+    if ([platform isEqualToString:@"iPad3,5"])   return @"iPad4";
+    if ([platform isEqualToString:@"iPad3,6"])   return @"iPad4";
+    
+    //iPad Air
+    if ([platform isEqualToString:@"iPad4,1"])   return @"iPadAir";
+    if ([platform isEqualToString:@"iPad4,2"])   return @"iPadAir";
+    if ([platform isEqualToString:@"iPad4,3"])   return @"iPadAir";
+    if ([platform isEqualToString:@"iPad5,3"])   return @"iPadAir2";
+    if ([platform isEqualToString:@"iPad5,4"])   return @"iPadAir2";
+    
+    //iPad mini
+    if ([platform isEqualToString:@"iPad2,5"])   return @"iPadmini1G";
+    if ([platform isEqualToString:@"iPad2,6"])   return @"iPadmini1G";
+    if ([platform isEqualToString:@"iPad2,7"])   return @"iPadmini1G";
+    if ([platform isEqualToString:@"iPad4,4"])   return @"iPadmini2";
+    if ([platform isEqualToString:@"iPad4,5"])   return @"iPadmini2";
+    if ([platform isEqualToString:@"iPad4,6"])   return @"iPadmini2";
+    if ([platform isEqualToString:@"iPad4,7"])   return @"iPadmini3";
+    if ([platform isEqualToString:@"iPad4,8"])   return @"iPadmini3";
+    if ([platform isEqualToString:@"iPad4,9"])   return @"iPadmini3";
+    if ([platform isEqualToString:@"iPad5,1"])   return @"iPadmini4";
+    if ([platform isEqualToString:@"iPad5,2"])   return @"iPadmini4";
+    
+    if ([platform isEqualToString:@"i386"])      return @"iPhoneSimulator";
+    if ([platform isEqualToString:@"x86_64"])    return @"iPhoneSimulator";
+    return platform;
+}
 @end

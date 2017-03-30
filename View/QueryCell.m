@@ -70,17 +70,45 @@
     timeString = [NSString stringWithFormat:@"%02d-%02d %02d:%02d",[data.Month intValue] ,[data.day intValue],hour,minute];
     _timeLabel.text = timeString;
     _nameLabel.text = name;
-    if (value == 1) {//2value
-        float t1 = [text1 floatValue] * [data.pt intValue] * [data.ct intValue];
-        float t2 = [text2 floatValue] * [data.pt intValue] * [data.ct intValue];
-        float t3 = [text3 floatValue] * [data.pt intValue] * [data.ct intValue];
-        text1 = [NSString stringWithFormat:@"%f",t1];
-        text2 = [NSString stringWithFormat:@"%f",t2];
-        text3 = [NSString stringWithFormat:@"%f",t3];
+    _nameLabel.adjustsFontSizeToFitWidth = YES;
+    //该数据处理应放在解析数据模块
+    if (![self isNumText:text1]) {
+        text1 = @"ee.eeee";
     }
-    _tableCodeLabel1.text = [NSString stringWithFormat:@"%.4f",[text1 floatValue]];
-    _tableCodeLabel2.text = [NSString stringWithFormat:@"%.4f",[text2 floatValue]];
-    _tableCodeLabel3.text = [NSString stringWithFormat:@"%.4f",[text3 floatValue]];
+    if (![self isNumText:text2]) {
+        text2 = @"ee.eeee";
+    }
+    if (![self isNumText:text3]) {
+        text3 = @"ee.eeee";
+    }
+
+    if (value == 0) {//2value
+        if ([self isNumText:text1]) {
+            float t1 = [text1 doubleValue] * [data.pt doubleValue] * [data.ct doubleValue];
+            text1 = [NSString stringWithFormat:@"%.4f",t1];
+        }
+        if ([self isNumText:text2]) {
+            float t2 = [text2 doubleValue] * [data.pt doubleValue] * [data.ct doubleValue];
+            text2 = [NSString stringWithFormat:@"%.4f",t2];
+        }
+        if ([self isNumText:text3]) {
+            float t3 = [text3 doubleValue] * [data.pt doubleValue] * [data.ct doubleValue];
+            text3 = [NSString stringWithFormat:@"%.4f",t3];
+        }
+    }
+    _tableCodeLabel1.text = [NSString stringWithFormat:@"%@",text1];
+    _tableCodeLabel2.text = [NSString stringWithFormat:@"%@",text2];
+    _tableCodeLabel3.text = [NSString stringWithFormat:@"%@",text3];
 }
 
+- (BOOL)isNumText:(NSString *)str{
+    NSString * regex        = @"^([-][0-9]*|[0-9]*).[0-9]*$";
+    NSPredicate * pred      = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
+    BOOL isMatch            = [pred evaluateWithObject:str];
+    if (isMatch) {
+        return YES;
+    }else{
+        return NO;
+    }
+}
 @end

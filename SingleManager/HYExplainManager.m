@@ -24,8 +24,26 @@
     return manager;
 }
 
-
-////////////////////////////////////////////////////////////////////////
++(UIButton *)createButtonWithFrame:(CGRect)frame title:(NSString *)title titleColor:(UIColor *)titleColor imageName:(NSString *)imageName backgroundImageName:(NSString *)backgroundImageName target:(id)target selector:(SEL)selector
+{
+    UIButton * button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.frame = frame;
+    //设置标题
+    [button setTitle:title forState:UIControlStateNormal];
+    //设置标题颜色
+    [button setTitleColor:titleColor forState:UIControlStateNormal];
+    //设置图片
+    [button setImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
+    //设置背景图片
+    [button setBackgroundImage:[UIImage imageNamed:backgroundImageName] forState:UIControlStateNormal];
+    //添加点击事件
+    [button addTarget:target action:selector forControlEvents:UIControlEventTouchUpInside];
+    
+    button.backgroundColor = [UIColor clearColor];
+    
+    button.selected = NO;
+    return button;
+}////////////////////////////////////////////////////////////////////////
 ////功能：Q/GDW376->1-2009报文帧校验
 ////参数：返回1-正确  返回0-错误
 ////////////////////////////////////////////////////////////////////////
@@ -2796,7 +2814,9 @@ int TSRAPP_ADDFrameStartEnd(Byte * fame_buf,int len,Byte fame_type,UInt64 usr_id
                     [tableCode appendFormat:@"%02x",IDByte[1]];
                     [tableCode appendFormat:@"%02x",IDByte[0]];
                 }
+                
                 [codeArr addObject:tableCode];
+         
                 //数据
                 int a = pBuf[9+l];
                 switch (a) {
@@ -2839,10 +2859,8 @@ int TSRAPP_ADDFrameStartEnd(Byte * fame_buf,int len,Byte fame_type,UInt64 usr_id
                 data.name = wy_name;
                 data.ct  = wy_ct;
                 data.pt = wy_pt;
-                
                 //接收到的时间
                 receiveDate = @[data.year,data.Month,data.day,data.hour,data.mm];
-                NSLog(@"%@",tableCode);
                 NSMutableArray * nexTtimeArr = [[NSMutableArray alloc] init];
                 if ([self isPureInt:tableCode])
                 {
@@ -2853,7 +2871,7 @@ int TSRAPP_ADDFrameStartEnd(Byte * fame_buf,int len,Byte fame_type,UInt64 usr_id
                         BOOL flag = true;
                         for (DataModel * model in de.dataArr)
                         {
-                            if (([model.mm isEqualToString:data.mm] && [model.day isEqualToString:data.day] && [model.Month isEqualToString:data.Month] && [model.data isEqualToString:data.data] &&[model.year isEqualToString:data.year] && [model.name isEqualToString:data.name]))
+                            if (([model.mm isEqualToString:data.mm] && [model.day isEqualToString:data.day] && [model.Month isEqualToString:data.Month] && [model.data isEqualToString:data.data] &&[model.year isEqualToString:data.year] && [model.name isEqualToString:data.name] && [model.hour isEqualToString:data.hour]))
                             {
                                 flag = false;
                                 break;
@@ -2870,8 +2888,6 @@ int TSRAPP_ADDFrameStartEnd(Byte * fame_buf,int len,Byte fame_type,UInt64 usr_id
                     }
                     de.De_addr = wy_addr;
                     isEmpty = @"NO";
-                    //关闭错误接受
-//                    [HY_NSusefDefaults setObject:@"notEnd" forKey:@"End"];
                 }else{
                     
                     isEmpty = @"YES";
@@ -2925,7 +2941,7 @@ int TSRAPP_ADDFrameStartEnd(Byte * fame_buf,int len,Byte fame_type,UInt64 usr_id
                     NSDateFormatter * formatter = [[NSDateFormatter alloc] init];
                     [formatter setDateFormat:@"HH"];
                     NSString * currentDataString = [formatter stringFromDate:currentDate];
-                    if ([data.hour integerValue] == (24 - 6) || ([currentDataString integerValue] - [data.hour  integerValue]) == 6)
+                    if ([data.hour integerValue] == (24 - 5) || ([currentDataString integerValue] - [data.hour  integerValue]) == 5)
                     {
                         [nextAllData addObject:dic1];
                         [HY_NSusefDefaults setObject:nextAllData forKey:@"NextData"];
@@ -2963,7 +2979,7 @@ int TSRAPP_ADDFrameStartEnd(Byte * fame_buf,int len,Byte fame_type,UInt64 usr_id
             {
                 devices1.dataArr = devices.dataArr; //更新数据
             }
-            [add addObject:devices1.De_addr];
+                [add addObject:devices1.De_addr];
 
         }
         if (![add containsObject:devices.De_addr]) {

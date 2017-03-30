@@ -77,9 +77,12 @@
 
 - (void)createSocket
 {
-    HYScoketManage * manager = [HYScoketManage shareManager];
-    [manager getNetworkDatawithIP:ipv6Addr withTag:@"4"];
-    [SVProgressHUD showWithStatus:@"通讯中..."];
+    HYSingleManager *manager = [HYSingleManager sharedManager];
+    manager.tableCode_dict = [NSMutableDictionary dictionary];
+    manager.memory_Array = [NSMutableArray array];
+    HYScoketManage * manager1 = [HYScoketManage shareManager];
+    [manager1 getNetworkDatawithIP:SocketHOST withTag:@"4"];
+    [SVProgressHUD showWithStatus:@"正在请求表码"];
     [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeClear];
 }
 //创建TableView
@@ -113,11 +116,6 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     HYSingleManager *manager = [HYSingleManager sharedManager];
-    
-    NSArray *allKeys = [manager.tableCode_dict allKeys];
-    
-    NSArray *value = [manager.tableCode_dict allValues][0];
-    
 //    return allKeys.count*value.count;
     DeviceModel *model = display_Data[section];
     return model.dataArr.count;
@@ -126,10 +124,10 @@
 #pragma mark --3D
 -(void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    cell.layer.transform = CATransform3DMakeScale(0.1, 0.1, 1);
-    [UIView animateWithDuration:1 animations:^{
-        cell.layer.transform = CATransform3DMakeScale(1, 1, 1);
-    }];
+//    cell.layer.transform = CATransform3DMakeScale(0.1, 0.1, 1);
+//    [UIView animateWithDuration:1 animations:^{
+//        cell.layer.transform = CATransform3DMakeScale(1, 1, 1);
+//    }];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -215,7 +213,7 @@
     manager.memory_Array = [NSMutableArray array];
     HYScoketManage * manager1 = [HYScoketManage shareManager];
     [manager1 getNetworkDatawithIP:SocketHOST withTag:@"4"];
-    [SVProgressHUD showSuccessWithStatus:@"正在请求表码"];
+    [SVProgressHUD showWithStatus:@"正在请求表码"];
 }
 
 - (void)viewWillDisappear:(BOOL)animated

@@ -183,7 +183,6 @@ static const CGFloat kMaxWidth = 290.0f;
 + (void) updateNotifierWithAnimation : (UIView* ) notifierView withText : (NSString* ) text completion:(void (^)(BOOL finished))completion {
     CGRect finalFrame = notifierView.frame;
     finalFrame.origin.y = finalFrame.origin.y + 8;
-    
     [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseOut animations:^{
         notifierView.alpha = 0;
         notifierView.frame = finalFrame;

@@ -61,12 +61,21 @@ static HYScoketManage * manage = nil;
     isError = 0;
     end = [[NSString alloc] init];
     NSString * ipv6 = [self convertHostToAddress:SocketHOST];
-    if (![self validateSocket]) {
-        _sendSocket = [[GCDAsyncSocket alloc]initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+    if ([self validateSocket]) {
+        [_sendSocket disconnect];
     }
     _sendSocket = [[GCDAsyncSocket alloc]initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
-  BOOL  ret =  [_sendSocket connectToHost:ipv6 onPort:SocketonPort withTimeout:10 error:nil];
-    NSLog(@"socket连接%d",ret);
+    NSError * error = nil;
+    [_sendSocket connectToHost:ipv6 onPort:SocketonPort withTimeout:10 error:&error];
+    if (error.code == 2) {
+        [UIView addMJNotifierWithText:@"无法连接到服务器" dismissAutomatically:YES];
+    }
+}
+
+- (void)writeDataToHostWithTag:(NSString *)tag
+{
+    NSData * data = [[NSData alloc] init];
+    [_sendSocket writeData:data withTimeout:10 tag:0];
 }
 
 //处理支持IPv6
@@ -75,9 +84,6 @@ static HYScoketManage * manage = nil;
     NSError *err = nil;
     
     NSMutableArray *addresses = [GCDAsyncSocket lookupHost:host port:0 error:&err];
-    
-    //    NSLog(@"address%@",addresses);
-    
     NSData *address4 = nil;
     NSData *address6 = nil;
     
@@ -107,7 +113,31 @@ static HYScoketManage * manage = nil;
     
 }
 
+- (void)setupReadTimerWithTimeout:(NSTimeInterval)timeout
+{
+//    [SVProgressHUD showWithStatus:@"超时"];
+    [SVProgressHUD dismiss];
+}
+- (void)socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)error
+{
+    NSLog(@"%ld",error.code);
+    if (error.code == 3) {
+        NSLog(@"超时");
+//        [self setupReadTimerWithTimeout:5];
+        [SVProgressHUD dismiss];
+        [UIView addMJNotifierWithText:@"请检查您的网络环境" dismissAutomatically:YES];
+    }else if(error.code == 51){
+        [SVProgressHUD dismiss];
+        [UIView addMJNotifierWithText:@"网络无连接" dismissAutomatically:YES];
+    }else if(error.code == 0){
 
+    }else if(error.code == 4){
+        [SVProgressHUD dismiss];
+        NSLog(@"Socket 断开链接%d",[_sendSocket isConnected]);
+    }
+
+
+}
 //建立连接
 - (void)socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(UInt16)port{
     int tag = [_tag intValue];
@@ -146,7 +176,16 @@ static HYScoketManage * manage = nil;
         }
             
             break;
+        case 5:
+        {//状态tag = 5
+            //            self.timeArray = [self returnTimeArray:3];
+            //            [self writeDataToHost];
+            [SVProgressHUD showWithStatus:@"通讯中..."];
+            [_sendSocket readDataWithTimeout:10 tag:0];
+        }
             
+            break;
+    
         case 4:
         {//表码
             HYExplainManager *expalin = [HYExplainManager shareManager];
@@ -179,7 +218,6 @@ static HYScoketManage * manage = nil;
 
 //接收数据
 - (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag{
-    NSLog(@"%@",data);
     HYExplainManager *manager = [HYExplainManager shareManager];
     unsigned char outbuf[1024*4];
     int rLen;
@@ -233,7 +271,14 @@ static HYScoketManage * manage = nil;
             [[NSNotificationCenter defaultCenter] postNotificationName:@"getStatusData" object:nil];
         }
     }
-    
+    //处理无功
+    if ([_tag isEqualToString:@"5"]) {
+        NSLog(@"aaa");
+        BOOL ret = [self isFinished1];
+        if (ret) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"getWUgongData" object:nil];
+        }
+    }
     //表码模块
     if ([_tag isEqualToString:@"4"]) {
         //判断数据是否都已经解析完
@@ -301,13 +346,12 @@ static HYScoketManage * manage = nil;
         [HY_NSusefDefaults setObject:nil forKey:@"NextData"];
         return true;
     }
-    NSLog(@"%d---%d",num,terminalNum);
     NSMutableArray * errorData = [HY_NSusefDefaults objectForKey:@"NextData"];
     for (int i = 0; i < errorData.count; i++)
     {
         num ++;
     }
-    if (num == (_time +1)*terminalNum ) {
+    if (num == (_time +1)*terminalNum) {
         if (errorData.count ==0) {
             [HY_NSusefDefaults removeObjectForKey:@"NextData"];
             return true;
@@ -446,10 +490,8 @@ static HYScoketManage * manage = nil;
                 case 3:
                 {//验证码过期否认
                     [SVProgressHUD showErrorWithStatus:@"验证码过期,请重新登录"];
-                    NSLog(@"aufsgfyugyegruyegrheklhragwwjjoadhiawhdawi");
                     [_sendSocket disconnect];
                     AppDelegate *delegate = (AppDelegate *)[[UIApplication sharedApplication]delegate];
-                    [delegate uninstall];
                     [delegate login];
                     break;
                 }
@@ -746,6 +788,9 @@ static HYScoketManage * manage = nil;
                 [manager TSR376_Analysis_QueryInfFame:dataBytes bufer_len:length iEnd:&iEnd];
             }else if ([_tag intValue] == 4){
                 [manager TSR376_Analysis_TableCodeInf:dataBytes bufer_len:length iEnd:&iEnd];
+            }else if([_tag intValue] == 5){// 无用功
+                //无功模块
+                [manager TSR376_Analysis_QueryInfFame:dataBytes bufer_len:length iEnd:&iEnd];
             }
             break;
         }
@@ -878,6 +923,8 @@ usePower模块
 {
     NSMutableArray * record = [[NSMutableArray alloc] init];//日期数组record[1]存储第一天的数组
     NSDate * currentDate = [NSDate date];
+    NSTimeInterval  oneSecond = 60*15;
+    NSDate * My_date = [NSDate dateWithTimeIntervalSinceNow:-oneSecond];
     NSDateFormatter * dateFormatter =[[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"YY/MM/dd/HH/mm"];
     NSTimeInterval  oneDay = 24*60*60*1;  //1天的长度
@@ -895,7 +942,7 @@ usePower模块
         [arr replaceObjectAtIndex:4 withObject:[NSString stringWithFormat:@"00"]];
         [array addObject:arr];
     }
-    NSString *dataString = [dateFormatter stringFromDate:currentDate];
+    NSString *dataString = [dateFormatter stringFromDate:My_date];
     NSArray *arr = [dataString componentsSeparatedByString:@"/"];
     NSMutableArray *a = [NSMutableArray arrayWithArray:arr];
     [a replaceObjectAtIndex:4 withObject:[NSString stringWithFormat:@"00"]];

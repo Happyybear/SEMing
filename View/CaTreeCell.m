@@ -43,7 +43,6 @@ static NSMutableArray * dataArrary;
 
 - (void)createButton{
     dataArrary = [[NSMutableArray alloc] initWithObjects:_tempData, nil];
-    NSLog(@"%d",dataArrary.count);
     for (Node * node in _dataSource) {
         UIButton * btn = [UIButton buttonWithType:UIButtonTypeCustom];
         btn.selected = NO;
@@ -69,8 +68,7 @@ static NSMutableArray * dataArrary;
         model.selected = NO;
 //        [[NSNotificationCenter defaultCenter] postNotificationName:@"selected" object:nil];
         [defaults removeObjectForKey:@"mpID"];
-        
-        
+        //发消息
         int level = 0;
         for (Node * node in _dataSource) {
             if (node.nodeId == _btn.intFlag - 201212) {
@@ -92,8 +90,10 @@ static NSMutableArray * dataArrary;
             }
         }
         if (level == 3) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"selected" object:model];
-            [defaults setObject:model.node.MpID forKey:@"mpID"];
+//            [defaults setObject:model.node.MpID forKey:@"mpID"];
+            //发消息
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"selected" object:model];
+            
         }
         [self btnActionWith:YES andButton:_btn andLevel:level];
         self.bthClick();
@@ -169,7 +169,28 @@ static NSMutableArray * dataArrary;
                     if ((button.intFlag -201212) == node.nodeId) {
                         if (node.depth == 3 && node.parentId == (btn.intFlag -201212)) {
                             button.selected = flag;
-//                            [self btnActionWith:flag1 andButton:button andLevel:3];
+                            if (flag) {
+                                //发消息
+                                NSMutableArray * arr = [NSMutableArray array];
+                                NSMutableArray * user = [HY_NSusefDefaults objectForKey:@"selectBtn"];
+                                if (user.count > 0) {
+                                    arr = [NSMutableArray arrayWithArray:user];
+                                }
+                                [arr addObject:node.MpID];
+                                [HY_NSusefDefaults setObject:arr forKey:@"selectBtn"];
+                                [[NSNotificationCenter defaultCenter] postNotificationName:@"selectedAll" object:nil];
+                            }else{
+                                NSMutableArray * arr = [NSMutableArray array];
+                                NSMutableArray * user = [HY_NSusefDefaults objectForKey:@"selectBtn"];
+                                if (user.count > 0) {
+                                    arr = [NSMutableArray arrayWithArray:user];
+                                }
+                                if ([arr containsObject:node.MpID]) {
+                                    [arr removeObject:node.MpID];
+                                }
+                                [HY_NSusefDefaults setObject:arr forKey:@"selectBtn"];
+
+                            }
                         }
                     }
                 }
@@ -196,6 +217,38 @@ static NSMutableArray * dataArrary;
         default:
             break;
     }
+    //处理上级按钮
+    Node * curenntNode = [[Node alloc] init];
+    for (Node * node in _dataSource) {
+        if (node.nodeId == (btn.intFlag -201212) ) {
+            curenntNode = node;
+        }
+    }
+    NSMutableArray * nodeArr = [[NSMutableArray alloc] init];
+    while (curenntNode.parentId != -1) {
+        [nodeArr addObject:curenntNode];
+        for (Node * node in _dataSource) {
+            if (node.nodeId == curenntNode.parentId) {
+                curenntNode = node;
+            }
+        }
+    }
+    for(Node * node in nodeArr){
+        for (UIButton * button in _btnArr) {
+            if  ( (button.intFlag - 201212) == node.nodeId) {
+                button.selected = flag;
+            }
+        }
+    }
+    //处理最上一集
+    for(Node * node in _dataSource){
+        for (UIButton * button in _btnArr) {
+            if  ( (button.intFlag - 201212) == node.nodeId && node.parentId == -1) {
+                button.selected = flag;
+            }
+        }
+    }
+
     NSMutableArray * btnTagArr = [[NSMutableArray alloc] init];
     for (UIButton * btn in _btnArr) {
         if (btn.selected) {

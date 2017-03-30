@@ -32,5 +32,6 @@
 //validateSocket
 - (BOOL)validateSocket;
 
+- (void)writeDataToHostWithTag:(NSString *)tag;
 @property (nonatomic,weak) id delegate;
 @end

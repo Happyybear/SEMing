@@ -44,9 +44,24 @@
 {
     _nameLabel.text = text1;
     _timeLabel.text = text2;
-    _tableCodeLabel.text = text3;
+    if ([self isNumText:text3]) {
+        _tableCodeLabel.text = [NSString stringWithFormat:@"%.4f",[text3 floatValue]];
+    }else{
+        _tableCodeLabel.text = text3;
+    }
 }
 
+
+- (BOOL)isNumText:(NSString *)str{
+    NSString * regex        = @"^[0-9]*$";
+    NSPredicate * pred      = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
+    BOOL isMatch            = [pred evaluateWithObject:str];
+    if (isMatch) {
+        return YES;
+    }else{
+        return NO;
+    }
+}
 -(void)setCellWithModel:(DataModel *)data
 {
     _nameLabel.text = data.name;

@@ -79,7 +79,7 @@ open class ChartUtils
             y: center.y + dist * sin(angle * Math.FDEG2RAD)
         )
     }
-    
+//节点小的参数值 以及 上面的label的名字
     open class func drawText(context: CGContext, text: String, point: CGPoint, align: NSTextAlignment, attributes: [String : AnyObject]?)
     {
         var point = point
@@ -148,10 +148,10 @@ open class ChartUtils
             
             (text as NSString).draw(at: drawOffset, withAttributes: attributes)
         }
-        
+
         NSUIGraphicsPopContext()
     }
-    
+//坐标
     internal class func drawMultilineText(context: CGContext, text: String, knownTextSize: CGSize, point: CGPoint, attributes: [String : AnyObject]?, constrainedToSize: CGSize, anchor: CGPoint, angleRadians: CGFloat)
     {
         var rect = CGRect(origin: CGPoint(), size: knownTextSize)
@@ -199,7 +199,7 @@ open class ChartUtils
         
         NSUIGraphicsPopContext()
     }
-    
+//横坐标的时间坐标值
     internal class func drawMultilineText(context: CGContext, text: String, point: CGPoint, attributes: [String : AnyObject]?, constrainedToSize: CGSize, anchor: CGPoint, angleRadians: CGFloat)
     {
         let rect = text.boundingRect(with: constrainedToSize, options: .usesLineFragmentOrigin, attributes: attributes, context: nil)

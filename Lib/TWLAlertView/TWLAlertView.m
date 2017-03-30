@@ -424,6 +424,21 @@
     
     
     _startF2 = [[UITextField alloc]initWithFrame:CGRectMake(65, 195, 60, 20)];
+    //
+    _startF1.keyboardType = UIKeyboardTypeNumberPad;
+    _startF2.keyboardType = UIKeyboardTypeNumberPad;
+    _startF3.keyboardType = UIKeyboardTypeNumberPad;
+    _startF4.keyboardType = UIKeyboardTypeNumberPad;
+    _startF5.keyboardType = UIKeyboardTypeNumberPad;
+    _startF6.keyboardType = UIKeyboardTypeNumberPad;
+    _endF2.keyboardType = UIKeyboardTypeNumberPad;
+    _endF3.keyboardType = UIKeyboardTypeNumberPad;
+    _endF4.keyboardType = UIKeyboardTypeNumberPad;
+    _endF5.keyboardType = UIKeyboardTypeNumberPad;
+    _endF6.keyboardType = UIKeyboardTypeNumberPad;
+    _endF1.keyboardType = UIKeyboardTypeNumberPad;
+    
+    //
     _endF2 = [[UITextField alloc]initWithFrame:CGRectMake(165, 195, 60, 20)];
     [_startF2 setBorderStyle:UITextBorderStyleLine];
     _startF2.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
@@ -524,6 +539,20 @@
     [buttons[0] setSelected:YES];
     [buttons1[0] setGroupButtons:buttons1];
     [buttons1[0] setSelected:YES];
+    
+    //键盘类型
+    _startF1.keyboardType = UIKeyboardTypeNumberPad;
+    _startF2.keyboardType = UIKeyboardTypeNumberPad;
+    _startF3.keyboardType = UIKeyboardTypeNumberPad;
+    _startF4.keyboardType = UIKeyboardTypeNumberPad;
+    _startF5.keyboardType = UIKeyboardTypeNumberPad;
+    _startF6.keyboardType = UIKeyboardTypeNumberPad;
+    _endF2.keyboardType = UIKeyboardTypeNumberPad;
+    _endF3.keyboardType = UIKeyboardTypeNumberPad;
+    _endF4.keyboardType = UIKeyboardTypeNumberPad;
+    _endF5.keyboardType = UIKeyboardTypeNumberPad;
+    _endF6.keyboardType = UIKeyboardTypeNumberPad;
+    _endF1.keyboardType = UIKeyboardTypeNumberPad;
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     _startF1.text = [defaults objectForKey:@"st1"];
