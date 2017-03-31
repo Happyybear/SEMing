@@ -30,12 +30,14 @@
     int appendLen;
     UITableView *_tableView;
     NSMutableArray *_dataSource;
+    NSMutableArray *_displayDataSource;
     NSMutableArray *_dataSourceA;
     NSMutableArray *_dataSourceB;
     NSMutableArray *_dataSourceC;
     NSMutableArray *_timeArray;//时间数组
     NSMutableArray *_nameArr;//名字数组
     int _days;
+    int currentDay;
     NSString *_MpName;//用来创建折线图时接收通知传值
     NSString *_MpID;//同上
     UILabel *_MpLabel;//webVied上边表示表名字的label
@@ -58,6 +60,7 @@
     [super viewDidLoad];
     HYSingleManager *manager = [HYSingleManager sharedManager];
     manager.memory_Array = [[NSMutableArray alloc] init];
+    _displayDataSource = [[NSMutableArray alloc] init];
     [self recieveData];
     if (manager.user.user_type == 4) {
         //提示升级
@@ -139,6 +142,8 @@
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSNumber *number = [defaults objectForKey:@"whichOption"];
     NSString *string = [NSString stringWithFormat:@"%@",number];
+    HYSingleManager * manager = [HYSingleManager sharedManager];
+    manager.memory_Array = [[NSMutableArray alloc] init];
     if ([self isBlankString:string]) {
         _label1 = @"总有功功率";
         _label2 = @"总无功功率";
@@ -548,9 +553,6 @@
     _dataSourceB = [NSMutableArray array];
     _dataSourceC = [NSMutableArray array];
     _dataSource = [NSMutableArray array];
-    _timeArr = [NSMutableArray array];
-    _nameArr = [NSMutableArray array];
-    
 }
 
 
@@ -959,7 +961,6 @@
     UIButton *btn10 = (UIButton *)[alertView viewWithTag:20004];//无功
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    
     if ([btn1 isSelected]&&[btn3 isSelected]&&[btn6 isSelected]) {
         NSLog(@"一次值,三天,总功率");
         [defaults setBool:btn1.selected forKey:@"yici"];
@@ -974,7 +975,6 @@
         [defaults removeObjectForKey:@"wugong"];
         [defaults setObject:[NSNumber numberWithInt:0] forKey:@"whichOption"];
         [defaults synchronize];
-        [self initDictionary];
         request_type = 1;
         requestValue = 0;//0 表示一次值 1 表示二次值
         _label1 = @"总有功功率";
@@ -1007,7 +1007,6 @@
         [defaults removeObjectForKey:@"wugong"];
         [defaults setObject:[NSNumber numberWithInt:1] forKey:@"whichOption"];
         [defaults synchronize];
-        [self initDictionary];
         request_type = 2;
         requestValue = 0;
         _label1 = @"A相电压";
@@ -1039,7 +1038,6 @@
         [defaults removeObjectForKey:@"wugong"];
         [defaults setObject:[NSNumber numberWithInt:2] forKey:@"whichOption"];
         [defaults synchronize];
-        [self initDictionary];
         request_type = 3;
         requestValue = 0;
         _label1 = @"A相电流";
@@ -1070,7 +1068,6 @@
         [defaults removeObjectForKey:@"wugong"];
         [defaults setObject:[NSNumber numberWithInt:3] forKey:@"whichOption"];
         [defaults synchronize];
-        [self initDictionary];
         request_type = 4;
         requestValue = 0;
         _label1 = @"A相有功功率";
@@ -1102,7 +1099,6 @@
         [defaults removeObjectForKey:@"zonggong"];
         [defaults setObject:[NSNumber numberWithInt:4] forKey:@"whichOption"];
         [defaults synchronize];
-        [self initDictionary];
         request_type = 5;
         requestValue = 0;
         _label1 = @"A相无功功率";
@@ -1134,7 +1130,6 @@
         [defaults removeObjectForKey:@"wugong"];
         [defaults setObject:[NSNumber numberWithInt:5] forKey:@"whichOption"];
         [defaults synchronize];
-        [self initDictionary];
         request_type = 1;
         requestValue = 0;
         _label1 = @"总有功功率";
@@ -1166,7 +1161,6 @@
         [defaults removeObjectForKey:@"wugong"];
         [defaults setObject:[NSNumber numberWithInt:6] forKey:@"whichOption"];
         [defaults synchronize];
-        [self initDictionary];
         request_type = 2;
         requestValue = 0;
         _label1 = @"A相电压";
@@ -1198,7 +1192,6 @@
         [defaults removeObjectForKey:@"wugong"];
         [defaults setObject:[NSNumber numberWithInt:7] forKey:@"whichOption"];
         [defaults synchronize];
-        [self initDictionary];
         request_type = 3;
         requestValue = 0;
         _label1 = @"A相电流";
@@ -1230,7 +1223,6 @@
         [defaults removeObjectForKey:@"wugong"];
         [defaults setObject:[NSNumber numberWithInt:8] forKey:@"whichOption"];
         [defaults synchronize];
-        [self initDictionary];
         request_type = 4;
         requestValue = 0;
         _label1 = @"A相有功功率";
@@ -1263,7 +1255,6 @@
         [defaults removeObjectForKey:@"zonggong"];
         [defaults setObject:[NSNumber numberWithInt:9] forKey:@"whichOption"];
         [defaults synchronize];
-        [self initDictionary];
         request_type = 5;
         requestValue = 0;
         _label1 = @"A相无功功率";
@@ -1375,7 +1366,6 @@
         [defaults removeObjectForKey:@"wugong"];
         [defaults setObject:[NSNumber numberWithInt:15] forKey:@"whichOption"];
         [defaults synchronize];
-        [self initDictionary];
         request_type = 1;
         requestValue = 1;
         _label1 = @"总有功功率";
@@ -1406,7 +1396,6 @@
         [defaults removeObjectForKey:@"wugong"];
         [defaults setObject:[NSNumber numberWithInt:16] forKey:@"whichOption"];
         [defaults synchronize];
-        [self initDictionary];
         request_type = 2;
         requestValue = 1;
         _label1 = @"A相电压";
@@ -1438,7 +1427,6 @@
         [defaults removeObjectForKey:@"wugong"];
         [defaults setObject:[NSNumber numberWithInt:17] forKey:@"whichOption"];
         [defaults synchronize];
-        [self initDictionary];
         request_type = 3;
         requestValue = 1;
         _label1 = @"A相电流";
@@ -1470,7 +1458,6 @@
         [defaults removeObjectForKey:@"wugong"];
         [defaults setObject:[NSNumber numberWithInt:18] forKey:@"whichOption"];
         [defaults synchronize];
-        [self initDictionary];
         request_type = 4;
         requestValue = 1;
         _label1 = @"A相有功功率";
@@ -1502,7 +1489,6 @@
         [defaults removeObjectForKey:@"zonggong"];
         [defaults setObject:[NSNumber numberWithInt:19] forKey:@"whichOption"];
         [defaults synchronize];
-        [self initDictionary];
         request_type = 5;
         requestValue = 1;
         _label1 = @"A相无功功率";
@@ -1534,7 +1520,6 @@
         [defaults removeObjectForKey:@"wugong"];
         [defaults setObject:[NSNumber numberWithInt:20] forKey:@"whichOption"];
         [defaults synchronize];
-        [self initDictionary];
         request_type = 1;
         requestValue = 1;
         _label1 = @"总有功功率";
@@ -1566,7 +1551,6 @@
         [defaults removeObjectForKey:@"wugong"];
         [defaults setObject:[NSNumber numberWithInt:21] forKey:@"whichOption"];
         [defaults synchronize];
-        [self initDictionary];
         request_type = 2;
         requestValue = 1;
         _label1 = @"A相电压";
@@ -1598,7 +1582,6 @@
         [defaults removeObjectForKey:@"wugong"];
         [defaults setObject:[NSNumber numberWithInt:22] forKey:@"whichOption"];
         [defaults synchronize];
-        [self initDictionary];
         request_type = 3;
         requestValue = 1;
         _label1 = @"A相电流";
@@ -1630,7 +1613,6 @@
         [defaults removeObjectForKey:@"wugong"];
         [defaults setObject:[NSNumber numberWithInt:23] forKey:@"whichOption"];
         [defaults synchronize];
-        [self initDictionary];
         request_type = 4;
         requestValue = 1;
         _label1 = @"A相有功功率";
@@ -1663,7 +1645,6 @@
         [defaults removeObjectForKey:@"zonggong"];
         [defaults setObject:[NSNumber numberWithInt:24] forKey:@"whichOption"];
         [defaults synchronize];
-        [self initDictionary];
         request_type = 5;
         requestValue = 1;
         _label1 = @"A相无功功率";
@@ -2035,12 +2016,12 @@
 - (void)addButton
 {
     //添加按钮
-    UIButton * btn1 = [HYExplainManager createButtonWithFrame:CGRectMake(SCREEN_W/2-60-35-35,0, 35 +50, 15) title:nil titleColor:[UIColor greenColor] imageName:nil backgroundImageName:nil target:self selector:@selector(action:)];
+    UIButton * btn1 = [HYExplainManager createButtonWithFrame:CGRectMake(SCREEN_W/2-60-35-35,0, 35 +50, 20) title:nil titleColor:[UIColor greenColor] imageName:nil backgroundImageName:nil target:self selector:@selector(action:)];
     [btn1 addTarget:self action:@selector(action:) forControlEvents:UIControlEventTouchUpInside];
     btn1.tag = 666;
-    UIButton * btn2 = [HYExplainManager createButtonWithFrame:CGRectMake(SCREEN_W/2-35,0, 35 + 50, 15) title:nil titleColor:[UIColor greenColor] imageName:nil backgroundImageName:nil target:self selector:@selector(action:)];
+    UIButton * btn2 = [HYExplainManager createButtonWithFrame:CGRectMake(SCREEN_W/2-35,0, 35 + 50, 20) title:nil titleColor:[UIColor greenColor] imageName:nil backgroundImageName:nil target:self selector:@selector(action:)];
     btn2.tag = 667;
-    UIButton * btn3 = [HYExplainManager createButtonWithFrame:CGRectMake(SCREEN_W/2+60,0, 35 + 50, 15) title:nil titleColor:[UIColor greenColor] imageName:nil backgroundImageName:nil target:self selector:@selector(action:)];
+    UIButton * btn3 = [HYExplainManager createButtonWithFrame:CGRectMake(SCREEN_W/2+60,0, 35 + 50, 20) title:nil titleColor:[UIColor greenColor] imageName:nil backgroundImageName:nil target:self selector:@selector(action:)];
     btn3.tag = 668;
     self.second.view.userInteractionEnabled = YES;
     UILabel * label1 = [[UILabel alloc] initWithFrame:CGRectMake(SCREEN_W/2-60-35-35, 7, 30, 3)];

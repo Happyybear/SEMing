@@ -101,7 +101,7 @@
     self.LineChartView.legend.formSize = 30;//图例中线条的长度
     self.LineChartView.legend.textColor = [UIColor darkGrayColor];//图例文字颜色
     //返回上一页按钮
-    UIButton *btn = [[UIButton alloc]initWithFrame:CGRectMake(568-50,10, 40, 30)];
+    UIButton *btn = [[UIButton alloc]initWithFrame:CGRectMake(SCREEN_H-50,10, 40, 30)];
     btn.layer.cornerRadius = 5;
     [btn setTitle:@"返回" forState:UIControlStateNormal];
     [btn.titleLabel setFont:[UIFont systemFontOfSize:13]];
@@ -115,12 +115,12 @@
 - (void)addButton
 {
     //添加按钮
-    UIButton * btn1 = [HYExplainManager createButtonWithFrame:CGRectMake(SCREEN_W/2-60-35-35,0, 35 +50, 15) title:nil titleColor:[UIColor greenColor] imageName:nil backgroundImageName:nil target:self selector:@selector(action:)];
+    UIButton * btn1 = [HYExplainManager createButtonWithFrame:CGRectMake(SCREEN_W/2-60-35-35,0, 35 +50, 30) title:nil titleColor:[UIColor greenColor] imageName:nil backgroundImageName:nil target:self selector:@selector(action:)];
     [btn1 addTarget:self action:@selector(action:) forControlEvents:UIControlEventTouchUpInside];
     btn1.tag = 1666;
-    UIButton * btn2 = [HYExplainManager createButtonWithFrame:CGRectMake(SCREEN_W/2-35,0, 35 + 50, 15) title:nil titleColor:[UIColor greenColor] imageName:nil backgroundImageName:nil target:self selector:@selector(action:)];
+    UIButton * btn2 = [HYExplainManager createButtonWithFrame:CGRectMake(SCREEN_W/2-35,0, 35 + 50, 30) title:nil titleColor:[UIColor greenColor] imageName:nil backgroundImageName:nil target:self selector:@selector(action:)];
     btn2.tag = 1667;
-    UIButton * btn3 = [HYExplainManager createButtonWithFrame:CGRectMake(SCREEN_W/2+60,0, 35 + 50, 15) title:nil titleColor:[UIColor greenColor] imageName:nil backgroundImageName:nil target:self selector:@selector(action:)];
+    UIButton * btn3 = [HYExplainManager createButtonWithFrame:CGRectMake(SCREEN_W/2+60,0, 35 + 50, 30) title:nil titleColor:[UIColor greenColor] imageName:nil backgroundImageName:nil target:self selector:@selector(action:)];
     btn3.tag = 1668;
     UILabel * label1 = [[UILabel alloc] initWithFrame:CGRectMake(SCREEN_W/2-60-35-35, 7, 30, 3)];
     label1.backgroundColor = RGB(255, 238, 0);
@@ -146,7 +146,7 @@
     labelName3.textColor = [UIColor grayColor];
     labelName3.adjustsFontSizeToFitWidth = YES;
     
-    UIView * backView = [[UIView alloc] initWithFrame:CGRectMake(SCREEN_H/2 - SCREEN_W/2, 0, SCREEN_H/2 +SCREEN_W/2  -55, 30)];
+    UIView * backView = [[UIView alloc] initWithFrame:CGRectMake(SCREEN_H/2 - SCREEN_W/2, 0, SCREEN_H/2 + SCREEN_W/2 -60, 30)];
     backView.backgroundColor = RGB(230, 253, 253);
     [self.view addSubview:backView];
     [backView addSubview:label1];

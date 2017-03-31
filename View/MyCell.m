@@ -53,7 +53,7 @@
 
 
 - (BOOL)isNumText:(NSString *)str{
-    NSString * regex        = @"^[0-9]*$";
+    NSString * regex        = @"^\\d*.\\d*|\\d*$";
     NSPredicate * pred      = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
     BOOL isMatch            = [pred evaluateWithObject:str];
     if (isMatch) {
@@ -66,7 +66,12 @@
 {
     _nameLabel.text = data.name;
     _timeLabel.text = [NSString stringWithFormat:@"20%@-%@-%@ %@:%@",data.year,data.Month,data.day,data.hour,data.mm];
-    _tableCodeLabel.text = data.data ;
+    NSString * text = data.data;
+    if ([self isNumText:data.data]) {
+       text = [NSString stringWithFormat:@"%.4f", [data.data doubleValue] * [data.ct intValue] * [data.pt  intValue] ];
+
+    }
+    _tableCodeLabel.text = text;
 }
 
 @end

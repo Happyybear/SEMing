@@ -347,6 +347,8 @@
 }
 - (void)createDataSource{
     [SVProgressHUD dismiss];
+    _nameArr = [NSMutableArray array];
+    _timeArr = [NSMutableArray array];
     NSData * data = [HY_NSusefDefaults objectForKey:@"usePowerData"];
     NSArray * dataArr = [NSKeyedUnarchiver unarchiveObjectWithData:data];
     int min= 0,position =0;
@@ -381,9 +383,11 @@
             [_timeArr addObject:time];
         }
     }
-        //计算用量
-    for (DeviceModel * de in _data)
+        //计算用量存入_dataSource
+    _dataSource = [[NSMutableArray alloc] init];
+    for (int k = 0; k < _data.count; k++)
     {
+        DeviceModel * de = _data[k];
         for (int i = 0; i<de.dataArr.count - 1; i++)
         {
             DataModel * data = de.dataArr[i];
@@ -393,7 +397,7 @@
             NSString * countString = [[NSString alloc] init];
             if ([self isFloatText:data1.data] && [self isFloatText:data.data]) {
                 count = [data1.data doubleValue] * [data1.ct doubleValue] * [data1.pt doubleValue] - [data.data doubleValue] * [data.ct doubleValue] * [data.pt doubleValue];
-                countString = [NSString stringWithFormat:@"%f",count];
+                countString = [NSString stringWithFormat:@"%.4f",count];
             }else{
                 countString = @"--------";
             }
@@ -418,6 +422,10 @@
 
 - (void)createDataSource1
 {
+    _nameArr = [NSMutableArray array];
+    _timeArr = [NSMutableArray array];
+    _data = [NSMutableArray array];
+    //初始化时间和name
     HYSingleManager *single = [HYSingleManager sharedManager];
     NSMutableArray *name_ID = [[NSMutableArray alloc]init];
     for (int i = 0; i<single.archiveUser.child_obj.count; i++) {
@@ -462,18 +470,17 @@
     
     NSMutableArray * valueArrary = [[NSMutableArray alloc]init];
     for (int i = 0; i < name_ID.count; i++) {
-        CMPModel *mp = [self FindMpCTAndPT:name_ID[i]];
         NSDictionary *dict = [single.usepower_dict objectForKey:name_ID[i]];
         NSMutableArray * arr = [[NSMutableArray alloc] init];
         for (int j = 0; j < _timeArray.count; j++) {
             NSArray * time = _timeArray[j];
             NSString * date1 = [NSString stringWithFormat:@"%@%@%@%02d",time[0],time[1],time[2],[time[3] intValue]];
             [arr addObject:dict[date1]];
-            NSLog(@"%@",date1);
         }
         [valueArrary addObject:arr];
     }
-    
+    //将数据存入_dataSource
+    _dataSource = [[NSMutableArray alloc] init];
     for (int i = 0; i<name_ID.count; i++) {
         CMPModel *mp = [self FindMpCTAndPT:name_ID[i]];
         NSDictionary *dict = [single.usepower_dict objectForKey:name_ID[i]];
@@ -890,12 +897,12 @@
 - (void)removeTableViewAndArray
 {
 //    [_tableView removeFromSuperview];
-    _nameArr = [NSMutableArray array];
-    _timeArr = [NSMutableArray array];
-    _dataSource = [NSMutableArray array];
+//    _nameArr = [NSMutableArray array];
+//    _timeArr = [NSMutableArray array];
+//    _dataSource = [NSMutableArray array];
     self.timeArray = [NSMutableArray array];
     HYSingleManager *manager = [HYSingleManager sharedManager];
-    manager.usepower_dict = [NSMutableDictionary dictionary];
+    manager.usepower_dict = [[NSMutableDictionary alloc] init];
     [HY_NSusefDefaults setObject:nil forKey:@"usePowerData"];
 }
 
@@ -1463,6 +1470,33 @@
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     return 1;
+}
+
+
+- (void)socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)error
+{
+    NSLog(@"tableCode%ld--%@",error.code,error.userInfo);
+    if (error.code == 3) {
+        NSLog(@"超时");
+        [SVProgressHUD dismiss];
+        [UIView addMJNotifierWithText:@"请检查您的网络环境" dismissAutomatically:YES];
+    }else if(error.code == 51){
+        [SVProgressHUD dismiss];
+        [UIView addMJNotifierWithText:@"网络无连接" dismissAutomatically:YES];
+    }else if(error.code == 0){
+        
+    }else if(error.code == 4){
+        [SVProgressHUD dismiss];
+        NSLog(@"Socket 断开链接%d",[_sendSocket isConnected]);
+    }else if(error.code == 61){
+        [SVProgressHUD dismiss];
+        [UIView addMJNotifierWithText:@"无法连接到服务器" dismissAutomatically:YES];
+    }else{
+        [SVProgressHUD dismiss];
+        [UIView addMJNotifierWithText:@"获取数据失败" dismissAutomatically:YES];
+    }
+    
+    
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath

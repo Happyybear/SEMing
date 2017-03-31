@@ -15,8 +15,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "120"
             endingLineNumber = "120"
-            landmarkName = "-TSR376_Get_All_frame::::"
-            landmarkType = "7">
+            landmarkName = "@implementation HYExplainManager"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -95,8 +95,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "581"
             endingLineNumber = "581"
-            landmarkName = "TerminalAddrToByte()"
-            landmarkType = "9">
+            landmarkName = "-TerminalAddrToByte:"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -143,7 +143,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1009"
             endingLineNumber = "1009"
-            landmarkName = "-TSR376_GetACK_UsrInfFame::::"
+            landmarkName = "-TSR376_Analysis_Land_return::"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -170,28 +170,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Controller/TableCodeVC/HYTableCodeViewController.m"
-            timestampString = "511412040.155044"
+            timestampString = "512616913.860443"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "153"
-            endingLineNumber = "153"
-            landmarkName = "@implementation HYTableCodeViewController"
-            landmarkType = "3">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Controller/UsePowerVC/HYUsePowerViewController.m"
-            timestampString = "511407152.950087"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "527"
-            endingLineNumber = "527"
-            landmarkName = "-createDataSource1"
+            startingLineNumber = "152"
+            endingLineNumber = "152"
+            landmarkName = "-GetDataSource"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -202,12 +186,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Controller/UsePowerVC/HYUsePowerViewController.m"
-            timestampString = "511407152.950087"
+            timestampString = "512618936.786997"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1058"
-            endingLineNumber = "1058"
-            landmarkName = "-createNewUI"
+            startingLineNumber = "534"
+            endingLineNumber = "534"
+            landmarkName = "-createDataSource1"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -362,11 +346,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SingleManager/HYExplainManager.m"
-            timestampString = "511666430.193051"
+            timestampString = "512616913.860443"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "3054"
-            endingLineNumber = "3054"
+            startingLineNumber = "3059"
+            endingLineNumber = "3059"
             landmarkName = "-TSR376_Analysis_TableCodeForHourInfNextFame:bufer_len:iEnd:With:"
             landmarkType = "7">
          </BreakpointContent>
@@ -378,11 +362,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SingleManager/HYExplainManager.m"
-            timestampString = "511666430.193051"
+            timestampString = "512616913.860443"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "3323"
-            endingLineNumber = "3323"
+            startingLineNumber = "3328"
+            endingLineNumber = "3328"
             landmarkName = "-TSR376_GetACK_QueryInfFame:mp_pointArr:mp_pointNum:timeArr:request_type:Usr_checkID:OutBufData:"
             landmarkType = "7">
          </BreakpointContent>
@@ -394,11 +378,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Controller/StateVC/HYStateViewController.m"
-            timestampString = "511671672.24113"
+            timestampString = "512552698.059332"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2119"
-            endingLineNumber = "2119"
+            startingLineNumber = "2100"
+            endingLineNumber = "2100"
             landmarkName = "-dealChartDataWithFlag:"
             landmarkType = "7">
          </BreakpointContent>
@@ -474,11 +458,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SingleManager/HYExplainManager.m"
-            timestampString = "511666430.193051"
+            timestampString = "512616913.860443"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "3615"
-            endingLineNumber = "3615"
+            startingLineNumber = "3620"
+            endingLineNumber = "3620"
             landmarkName = "-TSR376_Analysis_QueryInfFame:bufer_len:iEnd:"
             landmarkType = "7">
          </BreakpointContent>
@@ -490,11 +474,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SingleManager/HYExplainManager.m"
-            timestampString = "511666430.193051"
+            timestampString = "512616913.860443"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "3777"
-            endingLineNumber = "3777"
+            startingLineNumber = "3782"
+            endingLineNumber = "3782"
             landmarkName = "-TSR376_Analysis_QueryInfFame:bufer_len:iEnd:"
             landmarkType = "7">
          </BreakpointContent>
@@ -506,11 +490,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SingleManager/HYExplainManager.m"
-            timestampString = "511666430.193051"
+            timestampString = "512616913.860443"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "6207"
-            endingLineNumber = "6207"
+            startingLineNumber = "6212"
+            endingLineNumber = "6212"
             landmarkName = "-TSR376_Analysis_QueryInfFame:bufer_len:iEnd:"
             landmarkType = "7">
          </BreakpointContent>
@@ -522,11 +506,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Controller/StateVC/HYStateViewController.m"
-            timestampString = "511342864.3078"
+            timestampString = "512552698.059332"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "178"
-            endingLineNumber = "178"
+            startingLineNumber = "183"
+            endingLineNumber = "183"
             landmarkName = "-whichOption"
             landmarkType = "7">
          </BreakpointContent>
@@ -538,11 +522,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Controller/StateVC/HYStateViewController.m"
-            timestampString = "511342864.3078"
+            timestampString = "512552698.059332"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "167"
-            endingLineNumber = "167"
+            startingLineNumber = "172"
+            endingLineNumber = "172"
             landmarkName = "-whichOption"
             landmarkType = "7">
          </BreakpointContent>
@@ -554,11 +538,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Controller/StateVC/HYStateViewController.m"
-            timestampString = "511669066.014825"
+            timestampString = "512552698.059332"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "645"
-            endingLineNumber = "645"
+            startingLineNumber = "647"
+            endingLineNumber = "647"
             landmarkName = "-createDataSource"
             landmarkType = "7">
          </BreakpointContent>
@@ -585,60 +569,12 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Controller/UsePowerVC/HYUsePowerViewController.m"
-            timestampString = "511407152.950087"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1320"
-            endingLineNumber = "1320"
-            landmarkName = "-compare:::"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "-[HYUsePowerViewController tableView:cellForRowAtIndexPath:]"
-                  moduleName = "HYSEM"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/King/Desktop/SEMing/Controller/UsePowerVC/HYUsePowerViewController.m"
-                  timestampString = "511405911.65995"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "1319"
-                  endingLineNumber = "1319"
-                  offsetFromSymbolStart = "503">
-               </Location>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "-[HYUsePowerViewController tableView:cellForRowAtIndexPath:]"
-                  moduleName = "HYSEM"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/King/Desktop/SEMing/Controller/UsePowerVC/HYUsePowerViewController.m"
-                  timestampString = "511405911.663138"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "1319"
-                  endingLineNumber = "1319"
-                  offsetFromSymbolStart = "518">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "SingleManager/HYExplainManager.m"
-            timestampString = "511666430.193051"
+            timestampString = "512616913.860443"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2871"
-            endingLineNumber = "2871"
+            startingLineNumber = "2876"
+            endingLineNumber = "2876"
             landmarkName = "-TSR376_Analysis_TableCodeForHourInfFame:bufer_len:iEnd:With:"
             landmarkType = "7">
          </BreakpointContent>
@@ -682,11 +618,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Controller/StateVC/HYStateViewController.m"
-            timestampString = "511671672.24113"
+            timestampString = "512552698.059332"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1982"
-            endingLineNumber = "1982"
+            startingLineNumber = "1963"
+            endingLineNumber = "1963"
             landmarkName = "-createChartView"
             landmarkType = "7">
          </BreakpointContent>
@@ -698,12 +634,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "HYScoketManage.m"
-            timestampString = "511753376.10457"
+            timestampString = "512550340.133618"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "183"
-            endingLineNumber = "183"
-            landmarkName = "-socket:didReadData:withTag:"
+            startingLineNumber = "189"
+            endingLineNumber = "189"
+            landmarkName = "-socket:didConnectToHost:port:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -714,11 +650,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "HYScoketManage.m"
-            timestampString = "511758118.630978"
+            timestampString = "512619571.510898"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "632"
-            endingLineNumber = "632"
+            startingLineNumber = "637"
+            endingLineNumber = "637"
             landmarkName = "-TSR376_Analysis_All_Frame::"
             landmarkType = "7">
          </BreakpointContent>
@@ -730,11 +666,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "HYScoketManage.m"
-            timestampString = "511758118.630978"
+            timestampString = "512619571.510898"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "755"
-            endingLineNumber = "755"
+            startingLineNumber = "760"
+            endingLineNumber = "760"
             landmarkName = "-TSR376_Analysis_All_Frame::"
             landmarkType = "7">
          </BreakpointContent>

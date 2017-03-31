@@ -140,7 +140,6 @@
     
     //设置timeLabel字体大小
     [cell.timeLabel setFont:[UIFont systemFontOfSize:11]];
-    
     DeviceModel *model = display_Data[indexPath.section];
     DataModel * dataModel = model.dataArr[indexPath.row];
 //    [cell setNameLabel:self.nameArr[indexPath.row] timeLabel:self.timeArr[indexPath.row] tableCodeLabel:self.tableCodeArr[indexPath.row]];

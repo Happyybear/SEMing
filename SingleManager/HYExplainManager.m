@@ -2233,6 +2233,7 @@ int TSRAPP_ADDFrameStartEnd(Byte * fame_buf,int len,Byte fame_type,UInt64 usr_id
     ByteToTerminalAddr(&in_bufer[7],&strAddr);
     i += 5;
     arr = [[NSMutableArray alloc]init];
+    int ct = 1,pt = 1;
     for (i = 0; i<(nLen-8); )
     {
         l = i;
@@ -2279,6 +2280,8 @@ int TSRAPP_ADDFrameStartEnd(Byte * fame_buf,int len,Byte fame_type,UInt64 usr_id
                                 de.De_addr = [NSString stringWithFormat:@"%llu",mp.strID];
                                 wy_addr = [NSString stringWithFormat:@"%llu",mp.strID];
                                 wy_name = mp.name;
+                                ct = mp.mp_CT;
+                                pt = mp.mp_PT;
                             }
                         }
                      }
@@ -2293,6 +2296,8 @@ int TSRAPP_ADDFrameStartEnd(Byte * fame_buf,int len,Byte fame_type,UInt64 usr_id
                 //DataModel
                 DataModel * data = [[DataModel alloc] init];
                 data.D_id = [NSString stringWithFormat:@"%@",wy_addr];
+                data.pt = [NSString stringWithFormat:@"%d",pt];
+                data.ct = [NSString stringWithFormat:@"%d",ct];
                 for (int k = 0; k<5; k++,i++)//i++
                 {
                     IDByte[k] = pBuf[i];

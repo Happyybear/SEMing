@@ -120,7 +120,7 @@ static HYScoketManage * manage = nil;
 }
 - (void)socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)error
 {
-    NSLog(@"%ld",error.code);
+    NSLog(@"66%ld--%@",error.code,error.userInfo);
     if (error.code == 3) {
         NSLog(@"超时");
 //        [self setupReadTimerWithTimeout:5];
@@ -134,6 +134,12 @@ static HYScoketManage * manage = nil;
     }else if(error.code == 4){
         [SVProgressHUD dismiss];
         NSLog(@"Socket 断开链接%d",[_sendSocket isConnected]);
+    }else if(error.code == 61){
+        [SVProgressHUD dismiss];
+        [UIView addMJNotifierWithText:@"无法连接到服务器" dismissAutomatically:YES];
+    }else{
+//        [SVProgressHUD dismiss];
+//        [UIView addMJNotifierWithText:@"获取数据失败" dismissAutomatically:YES];
     }
 
 
@@ -273,7 +279,6 @@ static HYScoketManage * manage = nil;
     }
     //处理无功
     if ([_tag isEqualToString:@"5"]) {
-        NSLog(@"aaa");
         BOOL ret = [self isFinished1];
         if (ret) {
             [[NSNotificationCenter defaultCenter] postNotificationName:@"getWUgongData" object:nil];
